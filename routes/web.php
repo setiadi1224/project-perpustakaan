@@ -1,24 +1,26 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PetugasDashboardController;
 use App\Http\Controllers\UserDashboardController;
-use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| PUBLIC
+|--------------------------------------------------------------------------
+*/
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware(['auth', 'role:user'])->group(function () {
-    Route::get('/dashboard/user', [UserDashboardController::class, 'home'])->name('user.home');
-    Route::get('/dashboard/user/kategori', fn() => view('user.kategori'))->name('user.kategori');
-    Route::get('/dashboard/user/library', [UserDashboardController::class, 'library'])->name('user.library');
-    Route::get('/dashboard/user/riwayat', [UserDashboardController::class, 'riwayat'])->name('user.riwayat');
-    Route::get('/dashboard/user/denda',   [UserDashboardController::class, 'denda'])->name('user.denda');
-    Route::get('/profile', [App\Http\Controllers\UserDashboardController::class, 'profile'])->name('user.profile');
-    Route::post('/profile/update', [UserDashboardController::class, 'updateProfile'])->name('user.profile.update');
-});
+/*
+|--------------------------------------------------------------------------
+| AUTH (Guest Only)
+|--------------------------------------------------------------------------
+*/
 Route::middleware('guest')->group(function () {
     Route::get('/login',    [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login',   [LoginController::class, 'login']);
@@ -26,23 +28,59 @@ Route::middleware('guest')->group(function () {
     Route::post('/register',[RegisterController::class, 'register']);
 });
 
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
+/*
+|--------------------------------------------------------------------------
+| LOGOUT
+|--------------------------------------------------------------------------
+*/
+Route::post('/logout', [LoginController::class, 'logout'])
+    ->name('logout')
+    ->middleware('auth');
 
 /*
 |--------------------------------------------------------------------------
-| Dashboard Routes (protected by auth + role)
+| USER
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth')->group(function () {
-    // Petugas
-    Route::middleware('role:petugas')->group(function () {
-        Route::get('/dashboard/petugas', [DashboardController::class, 'petugas'])
-            ->name('petugas.dashboard');
-    });
+Route::middleware(['auth', 'role:user'])
+    ->prefix('dashboard/user')
+    ->name('user.')
+    ->group(function () {
 
-    // Kepala Perpustakaan
-    Route::middleware('role:kepala_perpustakaan')->group(function () {
-        Route::get('/dashboard/kepala', [DashboardController::class, 'kepala'])
-            ->name('kepala.dashboard');
-    });
+    Route::get('/', [UserDashboardController::class, 'home'])->name('home');
+    Route::get('/kategori', [UserDashboardController::class, 'kategori'])->name('kategori');
+    Route::get('/library', [UserDashboardController::class, 'library'])->name('library');
+    Route::get('/riwayat', [UserDashboardController::class, 'riwayat'])->name('riwayat');
+    Route::get('/denda', [UserDashboardController::class, 'denda'])->name('denda');
+    Route::get('/profile', [UserDashboardController::class, 'profile'])->name('profile');
+    Route::post('/profile/update', [UserDashboardController::class, 'updateProfile'])->name('profile.update');
+});
+
+/*
+|--------------------------------------------------------------------------
+| PETUGAS
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:petugas'])
+    ->prefix('dashboard/petugas')
+    ->name('petugas.')
+    ->group(function () {
+    Route::get('/', [PetugasDashboardController::class, 'home'])->name('home');
+    Route::get('/anggota', [PetugasDashboardController::class, 'anggota'])->name('anggota');
+    Route::post('/anggota/store', [PetugasDashboardController::class, 'store'])->name('anggota.store');
+    Route::put('/anggota/update/{id}', [PetugasDashboardController::class, 'update'])->name('anggota.update');
+    Route::delete('/anggota/delete/{id}', [PetugasDashboardController::class, 'destroy'])->name('anggota.delete');
+});
+
+/*
+|--------------------------------------------------------------------------
+| KEPALA PERPUSTAKAAN
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:kepala_perpustakaan'])
+    ->prefix('dashboard/kepala')
+    ->name('kepala.')
+    ->group(function () {
+
+    Route::get('/', [DashboardController::class, 'kepala'])->name('home');
 });

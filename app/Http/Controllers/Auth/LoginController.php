@@ -44,7 +44,7 @@ class LoginController extends Controller
 
         return match($user->role) {
             'kepala_perpustakaan' => redirect()->route('kepala.dashboard'),
-            'petugas'             => redirect()->route('petugas.dashboard'),
+            'petugas'             => redirect()->route('petugas.home'),
             default               => redirect()->route('user.home'),
         };
     }

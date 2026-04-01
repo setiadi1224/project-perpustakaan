@@ -10,7 +10,7 @@ class DashboardController extends Controller
 
     public function petugas()
     {
-        return view('dashboard.petugas');
+        return view('petugas.home');
     }
 
     public function kepala()
