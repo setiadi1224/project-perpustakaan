@@ -47,13 +47,15 @@ Route::middleware(['auth', 'role:user'])
     ->name('user.')
     ->group(function () {
 
-    Route::get('/', [UserDashboardController::class, 'home'])->name('home');
-    Route::get('/kategori', [UserDashboardController::class, 'kategori'])->name('kategori');
-    Route::get('/library', [UserDashboardController::class, 'library'])->name('library');
-    Route::get('/riwayat', [UserDashboardController::class, 'riwayat'])->name('riwayat');
-    Route::get('/denda', [UserDashboardController::class, 'denda'])->name('denda');
-    Route::get('/profile', [UserDashboardController::class, 'profile'])->name('profile');
-    Route::post('/profile/update', [UserDashboardController::class, 'updateProfile'])->name('profile.update');
+        Route::get('/', [UserDashboardController::class, 'home'])->name('home');
+        Route::get('/kategori', [UserDashboardController::class, 'kategori'])->name('kategori');
+        Route::get('/library', [UserDashboardController::class, 'library'])->name('library');
+        Route::get('/library/{id}', [UserDashboardController::class, 'detailBuku'])
+         ->name('buku.detail');
+        Route::get('/riwayat', [UserDashboardController::class, 'riwayat'])->name('riwayat');
+        Route::get('/denda', [UserDashboardController::class, 'denda'])->name('denda');
+        Route::get('/profile', [UserDashboardController::class, 'profile'])->name('profile');
+        Route::post('/profile/update', [UserDashboardController::class, 'updateProfile'])->name('profile.update');
 });
 
 /*
@@ -65,11 +67,21 @@ Route::middleware(['auth', 'role:petugas'])
     ->prefix('dashboard/petugas')
     ->name('petugas.')
     ->group(function () {
-    Route::get('/', [PetugasDashboardController::class, 'home'])->name('home');
-    Route::get('/anggota', [PetugasDashboardController::class, 'anggota'])->name('anggota');
-    Route::post('/anggota/store', [PetugasDashboardController::class, 'store'])->name('anggota.store');
-    Route::put('/anggota/update/{id}', [PetugasDashboardController::class, 'update'])->name('anggota.update');
-    Route::delete('/anggota/delete/{id}', [PetugasDashboardController::class, 'destroy'])->name('anggota.delete');
+
+        // Dashboard
+        Route::get('/', [PetugasDashboardController::class, 'home'])->name('home');
+
+        // Anggota
+        Route::get('/anggota', [PetugasDashboardController::class, 'anggota'])->name('anggota');
+        Route::post('/anggota/store', [PetugasDashboardController::class, 'store'])->name('anggota.store');
+        Route::put('/anggota/update/{id}', [PetugasDashboardController::class, 'update'])->name('anggota.update');
+        Route::delete('/anggota/delete/{id}', [PetugasDashboardController::class, 'destroy'])->name('anggota.delete');
+
+        // 🔥 BUKU (INI YANG DITAMBAHKAN)
+        Route::get('/buku', [PetugasDashboardController::class, 'buku'])->name('buku');
+        Route::post('/buku/store', [PetugasDashboardController::class, 'storeBuku'])->name('buku.store');
+        Route::put('/buku/update/{id}', [PetugasDashboardController::class, 'updateBuku'])->name('buku.update');
+        Route::delete('/buku/delete/{id}', [PetugasDashboardController::class, 'deleteBuku'])->name('buku.delete');
 });
 
 /*
@@ -82,5 +94,5 @@ Route::middleware(['auth', 'role:kepala_perpustakaan'])
     ->name('kepala.')
     ->group(function () {
 
-    Route::get('/', [DashboardController::class, 'kepala'])->name('home');
+        Route::get('/', [DashboardController::class, 'kepala'])->name('home');
 });

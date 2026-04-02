@@ -77,6 +77,16 @@ class UserDashboardController extends Controller
         $books = $query->paginate(6);
         return view('user.library', compact('books'));
     }
+    public function detailBuku($id)
+{
+    $buku = Buku::with('kategori')->findOrFail($id);
+
+    $rekomendasi = Buku::where('id', '!=', $id)
+        ->take(4)
+        ->get();
+
+    return view('user.detail_buku', compact('buku', 'rekomendasi'));
+}
 
     // RIWAYAT PEMINJAMAN
     public function riwayat()

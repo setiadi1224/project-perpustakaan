@@ -196,27 +196,28 @@
     {{-- Buku Populer --}}
     <div class="sec-title">Buku Populer</div>
     <div class="buku-grid">
-        @foreach($bukuPopuler as $i => $buku)
-            @php $color = $coverColors[$i % count($coverColors)]; @endphp
-            <a href="#" class="buku-card">
-                <div class="buku-cover" style="background: {{ $color }}; position:relative; overflow:hidden;">
-                    <div style="position:absolute;bottom:0;left:0;right:0;height:70%;background:linear-gradient(135deg,#8B6914,#C4A035,#6B4F0E);opacity:0.85;"></div>
-                    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);z-index:2;">
-                        <div style="width:52px;height:52px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;border:3px solid #2563EB;">
-                            <div style="width:38px;height:38px;border-radius:50%;background:#1D4ED8;display:flex;align-items:center;justify-content:center;">
-                                <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-                                    <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-                                </svg>
-                            </div>
-                        </div>
+    @foreach($bukuPopuler as $buku)
+        <a href="#" class="buku-card">
+            
+            {{-- COVER --}}
+            <div class="buku-cover">
+                @if($buku->cover)
+                    <img src="{{ asset('storage/'.$buku->cover) }}" alt="cover">
+                @else
+                    <div class="cover-placeholder">
+                        <span>Tidak ada cover</span>
                     </div>
-                </div>
-                <div class="buku-info">
-                    <div class="buku-judul">{{ $buku->judul }}</div>
-                    <div class="buku-penulis">{{ $buku->penulis }}</div>
-                </div>
-            </a>
-        @endforeach
-    </div>
+                @endif
+            </div>
+
+            {{-- INFO --}}
+            <div class="buku-info">
+                <div class="buku-judul">{{ $buku->judul }}</div>
+                <div class="buku-penulis">{{ $buku->penulis }}</div>
+            </div>
+
+        </a>
+    @endforeach
+</div>
 
 @endsection

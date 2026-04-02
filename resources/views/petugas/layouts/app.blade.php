@@ -4,7 +4,7 @@
     <title>Dashboard Petugas</title>
 </head>
 <style>
- /* RESET */
+/* RESET */
 * {
     margin: 0;
     padding: 0;
@@ -75,7 +75,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .header h1 {
@@ -148,7 +148,7 @@ table tbody tr:hover {
     background: #f9fafb;
 }
 
-/* ACTIONS (SEARCH + BUTTON) */
+/* ACTIONS */
 .actions {
     display: flex;
     gap: 10px;
@@ -165,7 +165,7 @@ table tbody tr:hover {
     border-color: #2563eb;
 }
 
-/* BUTTON UTAMA */
+/* BUTTON */
 .btn {
     background: #2563eb;
     color: white;
@@ -180,6 +180,7 @@ table tbody tr:hover {
     background: #1d4ed8;
 }
 
+/* ACTION GROUP */
 .action-group {
     display: flex;
     align-items: center;
@@ -188,12 +189,6 @@ table tbody tr:hover {
 
 .action-group form {
     margin: 0;
-}
-.action-group button {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 12px;
 }
 
 /* EDIT */
@@ -204,12 +199,10 @@ table tbody tr:hover {
     padding: 5px 10px;
     border-radius: 999px;
     cursor: pointer;
-    transition: 0.3s;
 }
 
 .edit:hover {
     background: #fde047;
-    color: #92400e;
 }
 
 /* HAPUS */
@@ -220,15 +213,13 @@ table tbody tr:hover {
     padding: 5px 10px;
     border-radius: 999px;
     cursor: pointer;
-    transition: 0.3s;
 }
 
 .hapus:hover {
     background: #fecaca;
-    color: #991b1b;
 }
 
-/* MODAL */
+/* ================= MODAL ================= */
 .modal {
     display: none;
     position: fixed;
@@ -242,27 +233,57 @@ table tbody tr:hover {
     align-items: center;
 }
 
+/* 🔥 FORM MODAL */
 .modal form {
     background: white;
     padding: 25px;
     border-radius: 14px;
-    width: 320px;
+    width: 420px;
+    max-width: 90%;
     display: flex;
     flex-direction: column;
     gap: 12px;
     animation: fadeIn 0.3s ease;
 }
 
-.modal input {
+/* INPUT */
+.modal input,
+.modal select,
+.modal textarea {
     padding: 10px;
     border-radius: 8px;
     border: 1px solid #ddd;
+    width: 100%;
+    font-size: 14px;
 }
 
-.modal input:focus {
+.modal input:focus,
+.modal select:focus,
+.modal textarea:focus {
     border-color: #2563eb;
     outline: none;
 }
+
+/* TEXTAREA */
+.modal textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* TITLE */
+.modal h3 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* BUTTON GROUP */
+.modal .form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+/* ANIMATION */
 @keyframes fadeIn {
     from {
         transform: translateY(-20px);
@@ -273,38 +294,33 @@ table tbody tr:hover {
         opacity: 1;
     }
 }
-/*logout*/
+
+/* LOGOUT */
 .sb-bottom {
     position: absolute;
     bottom: 20px;
     left: 20px;
     right: 20px;
 }
+
 .nav-item.logout {
     width: 100%;
     display: flex;
     align-items: center;
     gap: 10px;
-
     background: rgba(239, 68, 68, 0.1);
     color: #f87171;
-
     border: none;
     padding: 10px 12px;
     border-radius: 10px;
-
     cursor: pointer;
     transition: 0.3s;
     font-size: 14px;
 }
+
 .nav-item.logout:hover {
     background: #ef4444;
     color: white;
-    transform: translateY(-2px);
-}
-.nav-item.logout svg {
-    width: 16px;
-    height: 16px;
 }
 </style>
 <body>
@@ -320,6 +336,9 @@ table tbody tr:hover {
             </li>
             <li class="{{ request()->routeIs('petugas.anggota') ? 'active' : '' }}">
                 <a href="{{ route('petugas.anggota') }}">Kelola Anggota</a>
+            </li>
+            <li class="{{ request()->routeIs('petugas.buku') ? 'active' : '' }}">
+                <a href="{{ route('petugas.buku') }}">Kelola buku</a>
             </li>
         </ul>
 

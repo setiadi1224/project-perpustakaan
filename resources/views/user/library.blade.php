@@ -8,6 +8,7 @@
     gap: 20px;
     flex-wrap: wrap;
     margin-bottom: 30px;
+    text-decoration: none;
 }
 
 .book-item {
@@ -18,6 +19,7 @@
     box-shadow: 0 8px 20px rgba(0,0,0,0.08);
     text-align: center;
     transition: 0.3s;
+    text-decoration: none;
 }
 
 .book-item:hover {
@@ -58,6 +60,7 @@
     padding: 5px 10px;
     border-radius: 8px;
 }
+
 </style>
 
 <div class="container">
@@ -77,11 +80,11 @@
     <!-- 📚 CARD BUKU -->
     <div class="book-list">
         @forelse($books as $book)
-        <div class="book-item">
-            <img src="{{ $book->gambar ? asset('storage/'.$book->gambar) : 'https://via.placeholder.com/150' }}" alt="">
-            <h4>{{ $book->judul }}</h4>
+    <a href="{{ route('user.buku.detail', $book->id) }}" class="book-item">
+     <img src="{{ $book->cover ? asset('storage/'.$book->cover) : 'https://via.placeholder.com/150' }}" alt="">
+            <h4 class="">{{ $book->judul }}</h4>
             <p>{{ $book->penulis }}</p>
-        </div>
+</a>
         @empty
         <p>Tidak ada buku ditemukan</p>
         @endforelse

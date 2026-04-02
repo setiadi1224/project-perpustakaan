@@ -82,6 +82,16 @@
     color: #999;
 }
 </style>
+ <div style="margin-bottom: 20px;">
+        <form method="GET">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Cari buku..." 
+                value="{{ request('search') }}"
+                style="padding:10px 15px; border-radius:20px; border:1px solid #ccc; width:250px;">
+        </form>
+    </div>
 
 <div class="container">
 

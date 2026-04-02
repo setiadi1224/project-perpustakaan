@@ -112,6 +112,7 @@ body {
     align-items: center;
     justify-content: space-between;
     margin-bottom: 20px;
+    position: relative;
 }
 
 .search-wrap {
@@ -154,6 +155,8 @@ body {
     font-size: 13px;
     font-weight: 600;
     color: #374151;
+    position: absolute;
+    right: 0;
 }
 
 .avatar {
@@ -237,13 +240,6 @@ body {
 
     {{-- Topbar --}}
     <div class="topbar">
-        <form method="GET" action="{{ route('user.home') }}" class="search-wrap">
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-                <path d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari buku...">
-        </form>
-
         <div class="user-pill">
             <div class="avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
             {{ auth()->user()->name }}
