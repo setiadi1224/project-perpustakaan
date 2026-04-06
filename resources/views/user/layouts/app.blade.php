@@ -198,6 +198,7 @@
                 margin-left: 56px;
             }
         }
+        
     </style>
 
     @stack('styles')
@@ -226,14 +227,14 @@
                 </svg>
                 <span>Home</span>
             </a>
-            <a href="{{ route('user.kategori') }}"
+            {{-- <a href="{{ route('user.kategori') }}"
                 class="nav-item {{ request()->routeIs('user.kategori') ? 'active' : '' }}">
                 <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
                     <path d="M4 6h16M4 10h16M4 14h16M4 18h16" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" />
                 </svg>
                 <span>Category</span>
-            </a>
+            </a> --}}
             <a href="{{ route('user.library') }}"
                 class="nav-item {{ request()->routeIs('user.library') ? 'active' : '' }}">
                 <svg width="14" height="14" fill="none" viewBox="0 0 24 24">

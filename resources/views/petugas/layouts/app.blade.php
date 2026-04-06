@@ -305,10 +305,78 @@
         background: #ef4444;
         color: white;
     }
+    /* PAGINATION */
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 25px;
+}
+
+.pagination {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.pagination li {
+    list-style: none;
+}
+
+.pagination a,
+.pagination span {
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #334155;
+    transition: all 0.2s ease;
+}
+
+/* hover effect */
+.pagination a:hover {
+    background: #2563eb;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
+}
+
+/* active */
+.pagination .active span {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+/* disabled */
+.pagination .disabled span {
+    background: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* prev next icon */
+.pagination li:first-child a,
+.pagination li:last-child a {
+    font-weight: bold;
+}
+:root {
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --text: #111827;
+    --subtext: #6b7280;
+    --primary: #2563eb;
+}
 </style>
 
 <body>
-
     <div class="dashboard">
 
         <!-- SIDEBAR -->
@@ -348,7 +416,6 @@
         </div>
 
     </div>
-
     {{-- 🔥 INI WAJIB BANGET --}}
     @yield('script')
 

@@ -86,8 +86,8 @@ Route::middleware(['auth', 'role:petugas'])
             ->name('peminjaman.approve');
         Route::post('/peminjaman/tolak/{id}', [PetugasDashboardController::class, 'tolak'])
             ->name('peminjaman.tolak');
-        Route::post('/peminjaman/return/{id}', [PetugasDashboardController::class, 'return'])
-            ->name('peminjaman.return');
+        Route::post('/peminjaman/return/{id}', [PetugasDashboardController::class, 'returnBuku'])
+    ->name('peminjaman.return');
         Route::get('/denda', [PetugasDashboardController::class, 'denda'])
             ->name('denda');
     });
