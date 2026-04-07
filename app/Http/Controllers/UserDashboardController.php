@@ -24,19 +24,20 @@ class UserDashboardController extends Controller
 
         $totalPeminjaman = Peminjaman::where('user_id', $user->id)->count();
 
+        // 🔥 hanya hitung yang belum lunas
         $dendaAktif = Peminjaman::where('user_id', $user->id)
-            ->where('denda', '>', 0)
+            ->where('status_pembayaran', '!=', 'lunas')
             ->sum('denda');
 
         $kategoris = Kategori::all();
 
-       $bukuPopuler = Buku::with('kategori')
-    ->when($request->kategori, function ($q) use ($request) {
-        $q->where('kategori_id', $request->kategori);
-    })
-    ->latest()
-    ->paginate(8)
-    ->appends($request->only('kategori'));
+        $bukuPopuler = Buku::with('kategori')
+            ->when($request->kategori, function ($q) use ($request) {
+                $q->where('kategori_id', $request->kategori);
+            })
+            ->latest()
+            ->paginate(8)
+            ->appends($request->only('kategori'));
 
         return view('user.home', compact(
             'bukuDipinjam',
@@ -72,7 +73,7 @@ class UserDashboardController extends Controller
     }
 
     // ===============================
-    // PINJAM (MENUNGGU APPROVAL)
+    // PINJAM
     // ===============================
     public function pinjam(Request $request, $id)
     {
@@ -84,12 +85,10 @@ class UserDashboardController extends Controller
         $buku = Buku::findOrFail($id);
         $jumlah = (int) $request->jumlah;
 
-        // ❗ CEK STOK
         if ($jumlah > $buku->stok) {
             return back()->with('error', 'Stok tidak cukup');
         }
 
-        // ❗ CEK SUDAH PINJAM / MENUNGGU
         $cek = Peminjaman::where('user_id', $userId)
             ->where('buku_id', $id)
             ->whereIn('status', ['menunggu', 'dipinjam'])
@@ -99,17 +98,14 @@ class UserDashboardController extends Controller
             return back()->with('error', 'Kamu sudah meminjam / menunggu buku ini');
         }
 
-        // ❗ BATAS MAX 5 BUKU AKTIF
-        // ❗ BATAS MAX 5 BUKU (TERMASUK MENUNGGU)
         $totalDipinjam = Peminjaman::where('user_id', $userId)
             ->whereIn('status', ['dipinjam', 'menunggu'])
             ->sum('jumlah');
 
         if ($totalDipinjam + $jumlah > 5) {
-            return back()->with('error', 'Maksimal 5 buku (termasuk yang menunggu)');
+            return back()->with('error', 'Maksimal 5 buku');
         }
 
-        // ✅ SIMPAN (STATUS MENUNGGU)
         Peminjaman::create([
             'user_id' => $userId,
             'buku_id' => $id,
@@ -122,41 +118,44 @@ class UserDashboardController extends Controller
     }
 
     // ===============================
-    // RETURN BUKU
+    // RETURN (🔥 FIX DENDA)
     // ===============================
     public function returnBuku($id)
     {
-        $peminjaman = Peminjaman::with('buku')->findOrFail($id);
-        $userId = Auth::id();
+        $p = Peminjaman::with('buku')->findOrFail($id);
 
-        if ($peminjaman->user_id != $userId) {
+        if ($p->user_id != Auth::id()) {
             return back()->with('error', 'Akses ditolak');
         }
 
-        if ($peminjaman->status != 'dipinjam') {
-            return back()->with('error', 'Buku tidak bisa dikembalikan');
+        if ($p->status != 'dipinjam') {
+            return back()->with('error', 'Tidak valid');
         }
 
-        $hari = Carbon::parse($peminjaman->tanggal_pinjam)
-            ->diffInDays(now());
+        $today = now();
+        $batas = Carbon::parse($p->tanggal_kembali);
+
+        $terlambat = $today->gt($batas)
+            ? $batas->diffInDays($today)
+            : 0;
 
         $denda = 0;
 
-        if ($hari > 1) {
-            $dendaPerBuku = 20000 + (($hari - 1) * 5000);
-            $denda = $dendaPerBuku * $peminjaman->jumlah;
+        if ($terlambat > 0) {
+            $dendaPerHari = 5000;
+            $denda = $terlambat * $dendaPerHari * $p->jumlah;
         }
 
-        $peminjaman->update([
+        $p->update([
             'status' => 'dikembalikan',
-            'tanggal_kembali' => now(),
-            'denda' => $denda
+            'tanggal_dikembalikan' => $today,
+            'denda' => $denda,
+            'status_pembayaran' => $denda > 0 ? 'belum' : 'lunas'
         ]);
 
-        // 🔥 KEMBALIKAN STOK SESUAI JUMLAH
-        $peminjaman->buku->increment('stok', $peminjaman->jumlah);
+        $p->buku->increment('stok', $p->jumlah);
 
-        return back()->with('success', 'Buku dikembalikan. Denda: Rp ' . number_format($denda));
+        return back()->with('success', 'Buku dikembalikan');
     }
 
     // ===============================
@@ -204,7 +203,7 @@ class UserDashboardController extends Controller
     }
 
     // ===============================
-    // DENDA
+    // DENDA (🔥 FIX TOTAL)
     // ===============================
     public function denda()
     {
@@ -214,9 +213,60 @@ class UserDashboardController extends Controller
             ->latest()
             ->paginate(5);
 
-        $totalDenda = $denda->sum('denda');
+        $totalDenda = 0;
+
+        foreach ($denda as $item) {
+
+            $batas = Carbon::parse($item->tanggal_kembali);
+            $terlambat = 0;
+            $dendaFix = $item->denda;
+
+            if ($item->status == 'dipinjam' && now()->gt($batas)) {
+                $terlambat = $batas->diffInDays(now());
+                $dendaFix = $terlambat * 5000 * $item->jumlah;
+            }
+
+            // 🔥 kalau lunas nol
+            if ($item->status_pembayaran == 'lunas') {
+                $dendaFix = 0;
+            }
+
+            $item->terlambat = $terlambat;
+            $item->total_denda = $dendaFix;
+
+            $totalDenda += $dendaFix;
+        }
 
         return view('user.denda', compact('denda', 'totalDenda'));
+    }
+
+    // ===============================
+    // BAYAR (🔥 UNTUK MODAL)
+    // ===============================
+    public function bayar(Request $request, $id)
+    {
+        $p = Peminjaman::findOrFail($id);
+
+        if ($p->user_id != Auth::id()) {
+            return back()->with('error', 'Akses ditolak');
+        }
+
+        if ($p->status_pembayaran == 'lunas') {
+            return back()->with('error', 'Sudah dibayar');
+        }
+
+        $request->validate([
+            'bukti' => 'required|image|max:2048'
+        ]);
+
+        $file = $request->file('bukti')->store('bukti', 'public');
+
+        $p->update([
+            'bukti_pembayaran' => $file,
+            'status_pembayaran' => 'menunggu'
+        ]);
+
+        return back()->with('success', 'Bukti dikirim, tunggu verifikasi');
     }
 
     // ===============================
@@ -229,23 +279,17 @@ class UserDashboardController extends Controller
         ]);
     }
 
-    // ===============================
-    // UPDATE PROFILE
-    // ===============================
     public function updateProfile(Request $request)
     {
-        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $user->id
         ]);
-
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email
-        ]);
+/** @var \App\Models\User $user */
+$user = Auth::user();
+        $user->update($request->only('name', 'email'));
 
         return back()->with('success', 'Profile updated');
     }

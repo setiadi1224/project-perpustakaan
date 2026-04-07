@@ -63,8 +63,8 @@ tr {
 }
 
 .hapus {
-    background: #fee2e2;
-    color: #dc2626;
+    background: #ff2828;
+    color: #ffffff;
     border: none;
     padding: 5px 10px;
     border-radius: 999px;
@@ -227,14 +227,14 @@ tr {
                     <td>
                         <div class="action-group">
                             <button type="button" class="edit" onclick='editData(@json($b))'>
-                                ✏️ Edit
+                                 Edit
                             </button>
 
                             <form action="{{ route('petugas.buku.delete', $b->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
                                 <button class="hapus" onclick="return confirm('Hapus buku ini?')">
-                                    🗑️
+                                    Delete
                                 </button>
                             </form>
                         </div>

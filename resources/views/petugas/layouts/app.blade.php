@@ -381,13 +381,16 @@
 
         <!-- SIDEBAR -->
         <div class="sidebar">
-            <h2>📚 Petugas</h2>
+            <h2>Petugas</h2>
             <ul>
                 <li class="{{ request()->routeIs('petugas.home') ? 'active' : '' }}">
                     <a href="{{ route('petugas.home') }}">Dashboard</a>
                 </li>
                 <li class="{{ request()->routeIs('petugas.anggota') ? 'active' : '' }}">
                     <a href="{{ route('petugas.anggota') }}">Kelola Anggota</a>
+                </li>
+                <li class="{{ request()->routeIs('petugas.kategori') ? 'active' : '' }}">
+                    <a href="{{ route('petugas.kategori') }}">Kelola Kategori</a>
                 </li>
                 <li class="{{ request()->routeIs('petugas.buku') ? 'active' : '' }}">
                     <a href="{{ route('petugas.buku') }}">Kelola buku</a>

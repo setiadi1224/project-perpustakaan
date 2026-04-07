@@ -27,55 +27,50 @@
     border-radius: 20px;
     font-size: 12px;
     color: white;
+    border: none;
+    cursor: pointer;
 }
 
 .red { background: #ef4444; }
 .green { background: #10b981; }
+.orange { background: #f59e0b; }
 
-/* 🔥 PAGINATION */
+/* IMAGE PREVIEW */
+.img-preview {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.img-preview:hover {
+    transform: scale(1.1);
+}
+
+/* MODAL IMAGE */
+.modal-img {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+}
+
+.modal-img img {
+    display: block;
+    max-width: 90%;
+    max-height: 80%;
+    margin: 5% auto;
+    border-radius: 10px;
+}
+
+/* PAGINATION */
 .pagination-wrapper {
     display: flex;
     justify-content: center;
     margin-top: 25px;
-}
-
-.pagination {
-    display: flex;
-    gap: 8px;
-}
-
-.pagination li {
-    list-style: none;
-}
-
-.pagination a,
-.pagination span {
-    min-width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    border: 1px solid #e5e7eb;
-    background: #fff;
-    color: #374151;
-    text-decoration: none;
-    font-size: 13px;
-    transition: 0.2s;
-}
-
-.pagination a:hover {
-    background: #ef4444;
-    color: white;
-}
-
-.pagination .active span {
-    background: #ef4444;
-    color: white;
-}
-
-.pagination .disabled span {
-    opacity: 0.5;
 }
 </style>
 
@@ -94,6 +89,7 @@
                 <th>Buku</th>
                 <th>Terlambat</th>
                 <th>Total</th>
+                <th>Bukti</th> {{-- 🔥 BARU --}}
                 <th>Status</th>
             </tr>
         </thead>
@@ -105,17 +101,40 @@
                     <td>{{ $item->buku->judul }}</td>
                     <td>{{ $item->terlambat }} Hari</td>
                     <td>Rp {{ number_format($item->total_denda, 0, ',', '.') }}</td>
+
+                    {{-- 🔥 BUKTI PEMBAYARAN --}}
                     <td>
-                        @if ($item->total_denda > 0)
-                            <span class="badge red">Belum Bayar</span>
+                        @if($item->bukti_pembayaran)
+                            <img src="{{ asset('storage/' . $item->bukti_pembayaran) }}"
+                                 class="img-preview"
+                                 onclick="showImage(this.src)">
                         @else
-                            <span class="badge green">Lunas</span>
+                            <span style="color:#9ca3af;">Tidak ada</span>
                         @endif
                     </td>
+
+                    <td>
+                        @if($item->status_pembayaran == 'menunggu')
+                            <form action="{{ route('petugas.verifikasi.pembayaran', $item->id) }}" method="POST">
+                                @csrf
+                                <button class="badge orange"
+                                    onclick="return confirm('Konfirmasi pembayaran ini?')">
+                                    ✔️ Konfirmasi
+                                </button>
+                            </form>
+
+                        @elseif($item->status_pembayaran == 'lunas')
+                            <span class="badge green">Lunas</span>
+
+                        @else
+                            <span class="badge red">Belum Bayar</span>
+                        @endif
+                    </td>
+
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" style="text-align:center;">
+                    <td colspan="6" style="text-align:center;">
                         Tidak ada data denda
                     </td>
                 </tr>
@@ -123,16 +142,26 @@
         </tbody>
     </table>
 
-    {{-- INFO --}}
     <div style="margin-top:10px; font-size:13px; color:#64748b;">
         Menampilkan {{ $data->firstItem() ?? 0 }} - {{ $data->lastItem() ?? 0 }} 
         dari {{ $data->total() }} data
     </div>
 </div>
 
-{{-- 🔥 PAGINATION --}}
 <div class="pagination-wrapper">
     {{ $data->links() }}
 </div>
+
+{{-- 🔥 MODAL GAMBAR --}}
+<div id="modalImg" class="modal-img" onclick="this.style.display='none'">
+    <img id="imgPreview">
+</div>
+
+<script>
+function showImage(src) {
+    document.getElementById('modalImg').style.display = 'block';
+    document.getElementById('imgPreview').src = src;
+}
+</script>
 
 @endsection

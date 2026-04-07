@@ -60,6 +60,8 @@ Route::middleware(['auth', 'role:user'])
             ->name('pinjam');
         Route::post('/return/{id}', [UserDashboardController::class, 'returnBuku'])
             ->name('return');
+             Route::post('/bayar/{id}', [UserDashboardController::class, 'bayar'])
+            ->name('bayar');
     });
 
 /*
@@ -80,6 +82,14 @@ Route::middleware(['auth', 'role:petugas'])
         Route::post('/buku/store', [PetugasDashboardController::class, 'storeBuku'])->name('buku.store');
         Route::put('/buku/update/{id}', [PetugasDashboardController::class, 'updateBuku'])->name('buku.update');
         Route::delete('/buku/delete/{id}', [PetugasDashboardController::class, 'deleteBuku'])->name('buku.delete');
+       Route::get('/kategori', [PetugasDashboardController::class,'kategori'])
+            ->name('kategori');
+
+        Route::post('/kategori/store', [PetugasDashboardController::class,'storeKategori'])
+            ->name('kategori.store');
+
+        Route::delete('/kategori/delete/{id}', [PetugasDashboardController::class,'deleteKategori'])
+            ->name('kategori.delete');
         Route::get('/peminjaman', [PetugasDashboardController::class, 'peminjaman'])
             ->name('peminjaman');
         Route::post('/peminjaman/approve/{id}', [PetugasDashboardController::class, 'approve'])
@@ -90,6 +100,7 @@ Route::middleware(['auth', 'role:petugas'])
     ->name('peminjaman.return');
         Route::get('/denda', [PetugasDashboardController::class, 'denda'])
             ->name('denda');
+            Route::post('/verifikasi/{id}', [PetugasDashboardController::class, 'verifikasiPembayaran'])->name('verifikasi.pembayaran');
     });
 
 /*
@@ -101,13 +112,30 @@ Route::middleware(['auth', 'role:kepala_perpustakaan'])
     ->prefix('dashboard/kepala')
     ->name('kepala.')
     ->group(function () {
+
         Route::get('/', [KepalaDashboardController::class, 'home'])->name('home');
+
         Route::get('/petugas', [KepalaDashboardController::class, 'petugas'])
             ->name('petugas');
+
         Route::post('/petugas/store', [KepalaDashboardController::class, 'storePetugas'])
             ->name('petugas.store');
+
         Route::put('/petugas/update/{id}', [KepalaDashboardController::class, 'updatePetugas'])
             ->name('petugas.update');
+
         Route::delete('/petugas/delete/{id}', [KepalaDashboardController::class, 'deletePetugas'])
             ->name('petugas.delete');
+
+        // 🔥 LAPORAN (FIX)
+        Route::get('/laporan/peminjaman', [KepalaDashboardController::class, 'laporanPeminjaman'])
+            ->name('laporan.peminjaman');
+
+        Route::get('/laporan/denda', [KepalaDashboardController::class, 'laporanDenda'])
+            ->name('laporan.denda');
+
+        Route::get('/laporan/anggota', [KepalaDashboardController::class, 'laporanAnggota'])
+            ->name('laporan.anggota');
+Route::get('/laporan/peminjaman/cetak', [KepalaDashboardController::class, 'cetakPeminjaman'])
+    ->name('laporan.peminjaman.cetak');
     });

@@ -2,12 +2,98 @@
 
 @section('content')
 
+<style>
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.table-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 16px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.action-group {
+    display: flex;
+    gap: 5px;
+}
+
+.edit {
+    background: #7aabfb;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.hapus {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.btn {
+    background: #10b981;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal form {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 350px;
+}
+
+.modal input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+</style>
+
 <div class="header">
     <h1>Kelola Anggota</h1>
 
     <div class="actions">
-        {{-- 🔥 FIX SEARCH --}}
-        <form method="GET" action="{{ url()->current() }}">
+        <form method="GET">
             <input 
                 type="text" 
                 name="search" 
@@ -41,14 +127,14 @@
                     <td>
                         <div class="action-group">
                             <button type="button" class="edit" onclick='editData(@json($a))'>
-                                ✏️ Edit
+                                Edit
                             </button>
 
                             <form action="{{ route('petugas.anggota.delete', $a->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="hapus">
-                                    🗑️ Hapus
+                                     Delete
                                 </button>
                             </form>
                         </div>
@@ -62,15 +148,13 @@
         </tbody>
     </table>
 
-    {{-- INFO --}}
-    <div style="margin-top:10px; font-size:13px; color:#64748b;">
+    <div style="margin-top:10px; font-size:13px;">
         Menampilkan {{ $anggotas->firstItem() ?? 0 }} - {{ $anggotas->lastItem() ?? 0 }} 
         dari {{ $anggotas->total() }} data
     </div>
 </div>
 
-{{-- 🔥 PAGINATION CUSTOM --}}
-<div class="pagination-wrapper">
+<div style="margin-top:20px;">
     {{ $anggotas->links() }}
 </div>
 
@@ -80,15 +164,20 @@
         @csrf
         <input type="hidden" name="_method" id="method">
 
-        <h3 id="title">Tambah</h3>
+        <h3 id="title">Tambah Anggota</h3>
 
-        <input type="text" name="name" id="name" placeholder="Nama">
-        <input type="email" name="email" id="email" placeholder="Email">
+        <input type="text" name="name" id="name" placeholder="Nama" required>
+        <input type="email" name="email" id="email" placeholder="Email" required>
         <input type="text" name="no_telepon" id="no_telepon" placeholder="No HP">
         <input type="text" name="alamat" id="alamat" placeholder="Alamat">
-        <input type="password" name="password" id="password" placeholder="Password">
 
-        <button type="submit">Simpan</button>
+        {{-- 🔥 PASSWORD --}}
+        <input type="password" name="password" id="password" placeholder="Password (kosongkan jika tidak diubah)">
+
+        <br>
+
+        <button type="submit" class="btn">Simpan</button>
+        <button type="button" onclick="closeModal()">Batal</button>
     </form>
 </div>
 
@@ -98,23 +187,30 @@
 <script>
 function openModal() {
     document.getElementById('modal').style.display = 'flex';
+
     document.getElementById('form').action = "{{ route('petugas.anggota.store') }}";
     document.getElementById('method').value = '';
-    document.getElementById('title').innerText = 'Tambah';
+    document.getElementById('title').innerText = 'Tambah Anggota';
+
     document.getElementById('password').style.display = 'block';
 
     document.getElementById('name').value = '';
     document.getElementById('email').value = '';
     document.getElementById('no_telepon').value = '';
     document.getElementById('alamat').value = '';
+    document.getElementById('password').value = '';
 }
 
 function editData(data) {
     document.getElementById('modal').style.display = 'flex';
+
     document.getElementById('form').action = "/dashboard/petugas/anggota/update/" + data.id;
     document.getElementById('method').value = 'PUT';
-    document.getElementById('title').innerText = 'Edit';
-    document.getElementById('password').style.display = 'none';
+    document.getElementById('title').innerText = 'Edit Anggota';
+
+    // 🔥 PASSWORD TETAP MUNCUL
+    document.getElementById('password').style.display = 'block';
+    document.getElementById('password').value = '';
 
     document.getElementById('name').value = data.name;
     document.getElementById('email').value = data.email;
@@ -133,4 +229,4 @@ window.onclick = function(e) {
     }
 }
 </script>
-@endsection
+@endsection 

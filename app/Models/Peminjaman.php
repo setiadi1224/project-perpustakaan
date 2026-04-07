@@ -16,6 +16,8 @@ class Peminjaman extends Model
         'tanggal_dikembalikan',
         'status',
         'denda',
+        'bukti_pembayaran',
+    'status_pembayaran',
     ];
     protected $casts = [
         'tanggal_pinjam'       => 'date',

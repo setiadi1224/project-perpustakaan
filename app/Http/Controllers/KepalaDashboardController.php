@@ -7,6 +7,7 @@ use App\Models\Peminjaman;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class KepalaDashboardController extends Controller
 {
@@ -102,4 +103,34 @@ class KepalaDashboardController extends Controller
         $petugas->update($data);
         return back()->with('success', 'Petugas berhasil diupdate');
     }
+    public function laporanPeminjaman()
+{
+    $data = Peminjaman::with(['user','buku'])->latest()->paginate(10);
+    return view('kepala.laporan.peminjaman', compact('data'));
+}
+
+public function laporanDenda()
+{
+    $data = Peminjaman::with(['user','buku'])
+        ->where('denda','>',0)
+        ->latest()
+        ->paginate(10);
+
+    return view('kepala.laporan.denda', compact('data'));
+}
+
+public function laporanAnggota()
+{
+    $data = User::where('role','user')->latest()->paginate(10);
+    return view('kepala.laporan.anggota', compact('data'));
+}
+public function cetakPeminjaman()
+{
+    $data = Peminjaman::with(['user','buku'])->latest()->get();
+
+    $pdf = Pdf::loadView('kepala.laporan.cetak_peminjaman', compact('data'))
+        ->setPaper('A4', 'portrait');
+
+    return $pdf->stream('laporan_peminjaman.pdf');
+}
 }
