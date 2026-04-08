@@ -1,32 +1,55 @@
 @extends('user.layouts.app')
 
 @section('content')
-<style>
-.main-content { padding: 20px; }
 
+<style>
+.main-content { padding: 25px; }
+
+/* CARD */
 .card-denda {
-    background: linear-gradient(to right, #3b82f6, #1d4ed8);
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
     color: white;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
+    padding: 25px;
+    border-radius: 16px;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
-.card-table {
-    background: #f9fafb;
-    padding: 20px;
-    border-radius: 12px;
+.card-denda h2 {
+    font-size: 28px;
+    margin-top: 10px;
 }
 
 /* TABLE */
+.card-table {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
 table { width: 100%; border-collapse: collapse; }
-thead { color: #6b7280; font-size: 14px; }
-th, td { padding: 12px; }
-tbody tr { border-top: 1px solid #e5e7eb; }
+
+thead {
+    background: #f3f4f6;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+th, td { padding: 14px; }
+
+tbody tr {
+    border-top: 1px solid #e5e7eb;
+    transition: 0.2s;
+}
+
+tbody tr:hover {
+    background: #f9fafb;
+}
 
 /* BADGE */
 .badge {
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-radius: 20px;
     font-size: 12px;
     color: white;
@@ -37,12 +60,19 @@ tbody tr { border-top: 1px solid #e5e7eb; }
 
 /* BUTTON */
 .btn-bayar {
-    background: #3b82f6;
+    background: linear-gradient(to right, #3b82f6, #2563eb);
     color: white;
     border: none;
-    padding: 6px 12px;
-    border-radius: 8px;
+    padding: 7px 14px;
+    border-radius: 10px;
     cursor: pointer;
+    font-size: 13px;
+    transition: 0.2s;
+    box-shadow: 0 4px 10px rgba(59,130,246,0.3);
+}
+
+.btn-bayar:hover {
+    transform: translateY(-2px);
 }
 
 /* MODAL */
@@ -51,25 +81,38 @@ tbody tr { border-top: 1px solid #e5e7eb; }
     position: fixed;
     z-index: 999;
     inset: 0;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(5px);
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(6px);
 }
 
 .modal-content {
     background: white;
     width: 420px;
     max-width: 90%;
-    margin: 8% auto;
+    margin: 6% auto;
     padding: 25px;
-    border-radius: 16px;
-    position: relative;
+    border-radius: 18px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 .modal-close {
-    position: absolute;
-    right: 15px;
-    top: 15px;
+    float: right;
     cursor: pointer;
+    font-size: 18px;
+}
+
+/* INPUT */
+select, input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    margin-top: 5px;
 }
 
 /* BUTTON MODAL */
@@ -81,7 +124,7 @@ tbody tr { border-top: 1px solid #e5e7eb; }
 
 .btn-primary {
     flex: 1;
-    background: #3b82f6;
+    background: linear-gradient(to right, #3b82f6, #2563eb);
     color: white;
     padding: 10px;
     border: none;
@@ -137,11 +180,11 @@ tbody tr { border-top: 1px solid #e5e7eb; }
 
                     <td>
                         @if($item->status_pembayaran == 'belum')
-                            <span class="badge merah">Belum Bayar</span>
+                            <span class="badge merah">Belum</span>
                         @elseif($item->status_pembayaran == 'menunggu')
-                            <span class="badge orange">Menunggu</span>
+                            <span class="badge orange"> Menunggu</span>
                         @else
-                            <span class="badge hijau">Lunas</span>
+                            <span class="badge hijau"> Lunas</span>
                         @endif
                     </td>
 
@@ -149,7 +192,7 @@ tbody tr { border-top: 1px solid #e5e7eb; }
                         @if($item->denda > 0 && $item->status_pembayaran == 'belum')
                             <button class="btn-bayar"
                                 onclick="openModal({{ $item->id }}, {{ $item->denda }})">
-                                 Bayar
+                                Bayar
                             </button>
                         @elseif($item->status_pembayaran == 'menunggu')
                             <span style="color:orange;">Menunggu verifikasi</span>
@@ -176,19 +219,32 @@ tbody tr { border-top: 1px solid #e5e7eb; }
         <span class="modal-close" onclick="closeModal()">✖</span>
 
         <h3>Bayar Denda</h3>
+        <p style="font-size:13px; color:#6b7280;">
+            Pilih metode pembayaran. Jika online, upload bukti pembayaran.
+        </p>
+
         <h2 id="totalBayar">Rp 0</h2>
 
         <form id="formBayar" method="POST" enctype="multipart/form-data">
             @csrf
 
-            <input type="file" name="bukti" required>
+            <label>Metode Pembayaran</label>
+            <select name="metode" id="metode" onchange="toggleBukti()" required>
+                <option value="">-- Pilih Metode --</option>
+                <option value="offline">Bayar Offline</option>
+                <option value="online">Bayar Online</option>
+            </select>
+
+            <div id="buktiField" style="display:none; margin-top:10px;">
+                <label>Upload Bukti</label>
+                <input type="file" name="bukti" id="bukti">
+            </div>
 
             <div class="modal-actions">
                 <button type="submit" class="btn-primary">Kirim</button>
                 <button type="button" class="btn-secondary" onclick="closeModal()">Batal</button>
             </div>
         </form>
-
     </div>
 </div>
 
@@ -203,6 +259,10 @@ function openModal(id, denda) {
     url = url.replace(':id', id);
 
     document.getElementById('formBayar').action = url;
+
+    document.getElementById('metode').value = "";
+    document.getElementById('bukti').value = "";
+    document.getElementById('buktiField').style.display = 'none';
 }
 
 function closeModal() {
@@ -212,6 +272,21 @@ function closeModal() {
 function outsideClick(event) {
     if (event.target.id === 'modalBayar') {
         closeModal();
+    }
+}
+
+function toggleBukti() {
+    let metode = document.getElementById('metode').value;
+    let buktiField = document.getElementById('buktiField');
+    let buktiInput = document.getElementById('bukti');
+
+    if (metode === 'online') {
+        buktiField.style.display = 'block';
+        buktiInput.required = true;
+    } else {
+        buktiField.style.display = 'none';
+        buktiInput.required = false;
+        buktiInput.value = "";
     }
 }
 </script>

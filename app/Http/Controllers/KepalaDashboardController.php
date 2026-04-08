@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Buku;
 use App\Models\Peminjaman;
 use App\Models\User;
-use Barryvdh\DomPDF\PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+
 
 class KepalaDashboardController extends Controller
 {
@@ -42,7 +43,7 @@ class KepalaDashboardController extends Controller
                   ->orWhere('email', 'like', "%{$request->search}%");
             })
             ->latest()
-            ->paginate(10); // <-- paginate
+            ->paginate(10);
 
         return view('kepala.petugas', compact('petugas'));
     }
@@ -117,7 +118,7 @@ class KepalaDashboardController extends Controller
             ->whereMonth('tanggal_pinjam', $bulan)
             ->whereYear('tanggal_pinjam', $tahun);
 
-        $data = $query->paginate(10); // <-- paginate
+        $data = $query->paginate(10);
 
         return view('kepala.laporan.peminjaman', compact('data', 'bulan', 'tahun'));
     }
@@ -133,7 +134,7 @@ class KepalaDashboardController extends Controller
             ->whereYear('tanggal_pinjam', $tahun)
             ->get();
 
-        $pdf = PDF::loadView('kepala.laporan.cetak_peminjaman', compact('data', 'bulan', 'tahun'));
+        $pdf = pdf::loadView('kepala.laporan.cetak_peminjaman', compact('data', 'bulan', 'tahun'));
         return $pdf->stream('laporan-peminjaman-'.$bulan.'-'.$tahun.'.pdf');
     }
     // ================= LAPORAN DENDA =================

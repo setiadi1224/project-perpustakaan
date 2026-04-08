@@ -326,19 +326,27 @@ public function peminjaman(Request $request)
     }
 
     // ================= VERIFIKASI PEMBAYARAN =================
-    public function verifikasiPembayaran($id)
-    {
-        $p = Peminjaman::findOrFail($id);
+   public function konfirmasi($id)
+{
+    $p = \App\Models\Peminjaman::findOrFail($id);
 
-        if ($p->status_pembayaran == 'lunas') {
-            return back()->with('error', 'Sudah lunas');
-        }
+    $p->update([
+        'status_pembayaran' => 'lunas'
+    ]);
 
-        $p->update([
-            'status_pembayaran' => 'lunas',
-            'denda' => 0 // 🔥 penting!
-        ]);
+    return back()->with('success', 'Pembayaran berhasil dikonfirmasi');
+}
 
-        return back()->with('success', 'Pembayaran dikonfirmasi');
-    }
+public function tolak($id)
+{
+    $p = \App\Models\Peminjaman::findOrFail($id);
+
+    $p->update([
+        'status_pembayaran' => 'belum',
+        'bukti_pembayaran' => null,
+        'metode_pembayaran' => null
+    ]);
+
+    return back()->with('error', 'Pembayaran ditolak');
+}
 }

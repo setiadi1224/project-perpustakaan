@@ -5,9 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Perpustakaan Digital')</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
         rel="stylesheet">
+
     <style>
         * {
             box-sizing: border-box;
@@ -21,8 +23,10 @@
             min-height: 100vh;
             display: flex;
         }
+
+        /* SIDEBAR */
         .sidebar {
-            width: 150px;
+            width: 160px;
             min-height: 100vh;
             background: #0F172A;
             display: flex;
@@ -30,30 +34,29 @@
             position: fixed;
             top: 0;
             left: 0;
-            z-index: 50;
         }
 
         .sb-brand {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             padding: 20px 16px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.07);
         }
 
-        .sb-brand .brand-icon {
-            width: 28px;
-            height: 28px;
+        .brand-icon {
+            width: 30px;
+            height: 30px;
             background: #2563EB;
-            border-radius: 7px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
+            font-size: 16px;
         }
 
         .sb-brand span {
-            font-size: 13px;
+            font-size: 18px;
             font-weight: 600;
             color: #fff;
         }
@@ -62,32 +65,25 @@
             padding: 14px 10px;
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 6px;
             flex: 1;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 9px;
-            padding: 9px 10px;
-            border-radius: 8px;
-            font-size: 12.5px;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.45);
+            gap: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.55);
             text-decoration: none;
-            transition: all 0.15s;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-family: inherit;
-            width: 100%;
-            text-align: left;
+            transition: 0.2s;
         }
 
         .nav-item:hover {
-            background: rgba(255, 255, 255, 0.07);
-            color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
         }
 
         .nav-item.active {
@@ -96,97 +92,90 @@
         }
 
         .nav-item.logout {
-            color: rgba(255, 100, 100, 0.65);
-        }
-
-        .nav-item.logout:hover {
-            background: rgba(255, 80, 80, 0.1);
             color: #ff6b6b;
         }
 
         .sb-bottom {
-            padding: 10px;
-            border-top: 1px solid rgba(255, 255, 255, 0.07);
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+    }
+
+    .nav-item.logout {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(239, 68, 68, 0.1);
+        color: #f87171;
+        border: none;
+        padding: 10px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+        font-size: 14px;
+    }
+
+    .nav-item.logout:hover {
+        background: #ef4444;
+        color: white;
+    }
+
+        /* MAIN */
+        .main {
+            margin-left: 160px;
+            flex: 1;
+            padding: 24px;
         }
 
-        /* ══ MAIN ═════════════════════════════════════════════ */
-        .main {
-            margin-left: 150px;
-            flex: 1;
-            padding: 22px 24px;
-            min-height: 100vh;
-        }
         .topbar {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            justify-content: flex-end;
             margin-bottom: 20px;
-            position: relative;
-        }
-
-        .search-wrap {
-            position: relative;
-            width: 240px;
-        }
-
-        .search-wrap svg {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-        }
-
-        .search-wrap input {
-            width: 100%;
-            height: 38px;
-            background: #fff;
-            border: 1px solid #E5E7EB;
-            border-radius: 10px;
-            padding: 0 14px 0 34px;
-            font-family: inherit;
-            font-size: 13px;
-            color: #111827;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .search-wrap input:focus {
-            border-color: #2563EB;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .search-wrap input::placeholder {
-            color: #9CA3AF;
         }
 
         .user-pill {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 13px;
+            gap: 10px;
             font-weight: 600;
             color: #374151;
-            position: absolute;
-            right: 0;
+            background: #fff;
+            padding: 6px 12px;
+            border-radius: 999px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
 
+        /* AVATAR FIX */
         .avatar {
-            width: 34px;
-            height: 34px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: #2563EB;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
-            font-weight: 700;
+            background: #2563EB;
             color: #fff;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .avatar span {
+            font-size: 13px;
         }
 
         @media (max-width: 580px) {
             .sidebar {
-                width: 56px;
+                width: 60px;
             }
 
             .sb-brand span,
@@ -195,80 +184,42 @@
             }
 
             .main {
-                margin-left: 56px;
+                margin-left: 60px;
             }
         }
-        
     </style>
 
     @stack('styles')
 </head>
-
 <body>
-
-    {{-- ══ SIDEBAR ══ --}}
+    {{-- SIDEBAR --}}
     <aside class="sidebar">
         <div class="sb-brand">
-            <div class="brand-icon">
-                <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
-                    <path
-                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                        stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </div>
             <span>Anggota</span>
         </div>
 
         <nav class="sb-nav">
             <a href="{{ route('user.home') }}" class="nav-item {{ request()->routeIs('user.home') ? 'active' : '' }}">
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-                    <path d="M3 9.75L12 3l9 6.75V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z" stroke="currentColor"
-                        stroke-width="2" stroke-linejoin="round" />
-                </svg>
                 <span>Home</span>
             </a>
-            {{-- <a href="{{ route('user.kategori') }}"
-                class="nav-item {{ request()->routeIs('user.kategori') ? 'active' : '' }}">
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-                    <path d="M4 6h16M4 10h16M4 14h16M4 18h16" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" />
-                </svg>
-                <span>Category</span>
-            </a> --}}
+
             <a href="{{ route('user.library') }}"
                 class="nav-item {{ request()->routeIs('user.library') ? 'active' : '' }}">
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-                    <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" />
-                </svg>
                 <span>Library</span>
             </a>
+
             <a href="{{ route('user.riwayat') }}"
                 class="nav-item {{ request()->routeIs('user.riwayat') ? 'active' : '' }}">
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" />
-                </svg>
                 <span>Riwayat</span>
             </a>
+
             <a href="{{ route('user.denda') }}" class="nav-item {{ request()->routeIs('user.denda') ? 'active' : '' }}">
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-                    <path
-                        d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
                 <span>Denda</span>
             </a>
+
             <a href="{{ route('user.profile') }}"
                 class="nav-item {{ request()->routeIs('user.profile') ? 'active' : '' }}">
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-                    <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" />
-                </svg>
                 <span>Profile</span>
-            </a>
-            <a href="https://neal.fun/" class="nav-item">
-                Mini game
             </a>
         </nav>
 
@@ -276,29 +227,32 @@
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="nav-item logout">
-                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-                        <path
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                    </svg>
                     <span>Logout</span>
                 </button>
             </form>
         </div>
     </aside>
 
-    {{-- ══ MAIN ══ --}}
+    {{-- MAIN --}}
     <main class="main">
 
-        {{-- Topbar --}}
+        {{-- TOPBAR --}}
         <div class="topbar">
             <div class="user-pill">
-                <div class="avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
+
+                <div class="avatar">
+                    @if (auth()->user()->foto)
+                        <img src="{{ asset('storage/foto/' . auth()->user()->foto) }}" alt="avatar">
+                    @else
+                        <span>{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                    @endif
+                </div>
+
                 {{ auth()->user()->name }}
             </div>
         </div>
 
-        {{-- Konten halaman --}}
+        {{-- CONTENT --}}
         @yield('content')
 
     </main>

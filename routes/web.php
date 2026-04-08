@@ -73,35 +73,40 @@ Route::middleware(['auth', 'role:petugas'])
     ->prefix('dashboard/petugas')
     ->name('petugas.')
     ->group(function () {
+
         Route::get('/', [PetugasDashboardController::class, 'home'])->name('home');
+
+        // ANGGOTA
         Route::get('/anggota', [PetugasDashboardController::class, 'anggota'])->name('anggota');
         Route::post('/anggota/store', [PetugasDashboardController::class, 'store'])->name('anggota.store');
         Route::put('/anggota/update/{id}', [PetugasDashboardController::class, 'update'])->name('anggota.update');
         Route::delete('/anggota/delete/{id}', [PetugasDashboardController::class, 'destroy'])->name('anggota.delete');
+
+        // BUKU
         Route::get('/buku', [PetugasDashboardController::class, 'buku'])->name('buku');
         Route::post('/buku/store', [PetugasDashboardController::class, 'storeBuku'])->name('buku.store');
         Route::put('/buku/update/{id}', [PetugasDashboardController::class, 'updateBuku'])->name('buku.update');
         Route::delete('/buku/delete/{id}', [PetugasDashboardController::class, 'deleteBuku'])->name('buku.delete');
-       Route::get('/kategori', [PetugasDashboardController::class,'kategori'])
-            ->name('kategori');
 
-        Route::post('/kategori/store', [PetugasDashboardController::class,'storeKategori'])
-            ->name('kategori.store');
+        // KATEGORI
+        Route::get('/kategori', [PetugasDashboardController::class,'kategori'])->name('kategori');
+        Route::post('/kategori/store', [PetugasDashboardController::class,'storeKategori'])->name('kategori.store');
+        Route::delete('/kategori/delete/{id}', [PetugasDashboardController::class,'deleteKategori'])->name('kategori.delete');
 
-        Route::delete('/kategori/delete/{id}', [PetugasDashboardController::class,'deleteKategori'])
-            ->name('kategori.delete');
-        Route::get('/peminjaman', [PetugasDashboardController::class, 'peminjaman'])
-            ->name('peminjaman');
-        Route::post('/peminjaman/approve/{id}', [PetugasDashboardController::class, 'approve'])
-            ->name('peminjaman.approve');
-        Route::post('/peminjaman/tolak/{id}', [PetugasDashboardController::class, 'tolak'])
-            ->name('peminjaman.tolak');
-        Route::post('/peminjaman/return/{id}', [PetugasDashboardController::class, 'returnBuku'])
-    ->name('peminjaman.return');
-        Route::get('/denda', [PetugasDashboardController::class, 'denda'])
-            ->name('denda');
-            Route::post('/verifikasi/{id}', [PetugasDashboardController::class, 'verifikasiPembayaran'])->name('verifikasi.pembayaran');
+        // PEMINJAMAN
+        Route::get('/peminjaman', [PetugasDashboardController::class, 'peminjaman'])->name('peminjaman');
+        Route::post('/peminjaman/approve/{id}', [PetugasDashboardController::class, 'approve'])->name('peminjaman.approve');
+        Route::post('/peminjaman/tolak/{id}', [PetugasDashboardController::class, 'tolakPeminjaman'])->name('peminjaman.tolak');
+        Route::post('/peminjaman/return/{id}', [PetugasDashboardController::class, 'returnBuku'])->name('peminjaman.return');
+
+        // DENDA
+        Route::get('/denda', [PetugasDashboardController::class, 'denda'])->name('denda');
+
+        // 🔥 PEMBAYARAN DENDA (INI YANG PENTING)
+        Route::post('/denda/konfirmasi/{id}', [PetugasDashboardController::class, 'konfirmasi'])->name('konfirmasi');
+        Route::post('/denda/tolak/{id}', [PetugasDashboardController::class, 'tolakPembayaran'])->name('tolak');
     });
+
 
 /*
 |--------------------------------------------------------------------------

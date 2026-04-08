@@ -7,7 +7,7 @@
         margin: 20px auto;
         font-family: Arial, sans-serif;
     }
-    h2 {
+    .judul {
         text-align: center;
         margin-bottom: 20px;
     }
@@ -91,7 +91,7 @@
 </style>
 
 <div class="container">
-    <h2>Laporan Peminjaman Buku</h2>
+    <h2 class="judul">Laporan Peminjaman Buku</h2>
 
     <!-- Filter Bulan & Tahun -->
     <form action="{{ route('kepala.laporan.peminjaman') }}" method="GET" class="filter-form">

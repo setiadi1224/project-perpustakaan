@@ -222,18 +222,15 @@
     <li class="{{ request()->routeIs('kepala.petugas') ? 'active' : '' }}">
         <a href="{{ route('kepala.petugas') }}">Kelola Petugas</a>
     </li>
-
-    {{-- 🔥 LAPORAN --}}
+  <li class="{{ request()->routeIs('kepala.laporan.anggota') ? 'active' : '' }}">
+        <a href="{{ route('kepala.laporan.anggota') }}"> Anggota</a>
+    </li>
     <li class="{{ request()->routeIs('kepala.laporan.peminjaman') ? 'active' : '' }}">
         <a href="{{ route('kepala.laporan.peminjaman') }}"> Laporan Peminjaman</a>
     </li>
 
     <li class="{{ request()->routeIs('kepala.laporan.denda') ? 'active' : '' }}">
         <a href="{{ route('kepala.laporan.denda') }}"> Laporan Denda</a>
-    </li>
-
-    <li class="{{ request()->routeIs('kepala.laporan.anggota') ? 'active' : '' }}">
-        <a href="{{ route('kepala.laporan.anggota') }}"> Laporan Anggota</a>
     </li>
 </ul>
             <div class="sb-bottom">

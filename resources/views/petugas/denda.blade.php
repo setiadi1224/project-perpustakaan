@@ -28,14 +28,21 @@
     font-size: 12px;
     color: white;
     border: none;
-    cursor: pointer;
 }
 
-.red { background: #ef4444; }
-.green { background: #10b981; }
-.orange { background: #f59e0b; }
+.btn {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+}
 
-/* IMAGE PREVIEW */
+.red { background: #ef4444; color:white; }
+.green { background: #10b981; color:white; }
+.orange { background: #f59e0b; color:white; }
+
+/* IMAGE */
 .img-preview {
     width: 60px;
     height: 60px;
@@ -44,7 +51,6 @@
     cursor: pointer;
     transition: 0.2s;
 }
-
 .img-preview:hover {
     transform: scale(1.1);
 }
@@ -57,7 +63,6 @@
     inset: 0;
     background: rgba(0,0,0,0.7);
 }
-
 .modal-img img {
     display: block;
     max-width: 90%;
@@ -89,8 +94,10 @@
                 <th>Buku</th>
                 <th>Terlambat</th>
                 <th>Total</th>
-                <th>Bukti</th> {{-- 🔥 BARU --}}
+                <th>Metode</th> {{-- 🔥 BARU --}}
+                <th>Bukti</th>
                 <th>Status</th>
+                <th>Aksi</th> {{-- 🔥 BARU --}}
             </tr>
         </thead>
 
@@ -102,7 +109,18 @@
                     <td>{{ $item->terlambat }} Hari</td>
                     <td>Rp {{ number_format($item->total_denda, 0, ',', '.') }}</td>
 
-                    {{-- 🔥 BUKTI PEMBAYARAN --}}
+                    {{-- METODE --}}
+                    <td>
+                        @if($item->metode_pembayaran == 'online')
+                            <span class="badge orange">Online</span>
+                        @elseif($item->metode_pembayaran == 'offline')
+                            <span class="badge green">Offline</span>
+                        @else
+                            <span style="color:#9ca3af;">-</span>
+                        @endif
+                    </td>
+
+                    {{-- BUKTI --}}
                     <td>
                         @if($item->bukti_pembayaran)
                             <img src="{{ asset('storage/' . $item->bukti_pembayaran) }}"
@@ -113,28 +131,50 @@
                         @endif
                     </td>
 
+                    {{-- STATUS --}}
                     <td>
                         @if($item->status_pembayaran == 'menunggu')
-                            <form action="{{ route('petugas.verifikasi.pembayaran', $item->id) }}" method="POST">
+                            <span class="badge orange">Menunggu</span>
+                        @elseif($item->status_pembayaran == 'lunas')
+                            <span class="badge green">Lunas</span>
+                        @else
+                            <span class="badge red">Belum</span>
+                        @endif
+                    </td>
+
+                    {{-- AKSI --}}
+                    <td>
+                        @if($item->status_pembayaran == 'menunggu')
+
+                            {{-- KONFIRMASI --}}
+                            <form action="{{ route('petugas.konfirmasi', $item->id) }}"
+                                  method="POST" style="display:inline;">
                                 @csrf
-                                <button class="badge orange"
+                                <button class="btn green"
                                     onclick="return confirm('Konfirmasi pembayaran ini?')">
-                                    ✔️ Konfirmasi
+                                    ✔️
                                 </button>
                             </form>
 
-                        @elseif($item->status_pembayaran == 'lunas')
-                            <span class="badge green">Lunas</span>
+                            {{-- TOLAK --}}
+                            <form action="{{ route('petugas.tolak', $item->id) }}"
+                                  method="POST" style="display:inline;">
+                                @csrf
+                                <button class="btn red"
+                                    onclick="return confirm('Tolak pembayaran ini?')">
+                                    ✖
+                                </button>
+                            </form>
 
                         @else
-                            <span class="badge red">Belum Bayar</span>
+                            <span style="color:#9ca3af;">-</span>
                         @endif
                     </td>
 
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" style="text-align:center;">
+                    <td colspan="8" style="text-align:center;">
                         Tidak ada data denda
                     </td>
                 </tr>
@@ -152,7 +192,7 @@
     {{ $data->links() }}
 </div>
 
-{{-- 🔥 MODAL GAMBAR --}}
+{{-- MODAL GAMBAR --}}
 <div id="modalImg" class="modal-img" onclick="this.style.display='none'">
     <img id="imgPreview">
 </div>

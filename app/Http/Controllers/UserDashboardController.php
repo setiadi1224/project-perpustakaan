@@ -245,16 +245,25 @@ class UserDashboardController extends Controller
     // BAYAR (🔥 UNTUK MODAL)
     // ===============================
     public function bayar(Request $request, $id)
-    {
-        $p = Peminjaman::findOrFail($id);
+{
+    $p = Peminjaman::findOrFail($id);
 
-        if ($p->user_id != Auth::id()) {
-            return back()->with('error', 'Akses ditolak');
-        }
+    if ($p->user_id != Auth::id()) {
+        return back()->with('error', 'Akses ditolak');
+    }
 
-        if ($p->status_pembayaran == 'lunas') {
-            return back()->with('error', 'Sudah dibayar');
-        }
+    if ($p->status_pembayaran == 'lunas') {
+        return back()->with('error', 'Sudah dibayar');
+    }
+
+    $request->validate([
+        'metode' => 'required|in:offline,online'
+    ]);
+
+    // ===============================
+    // JIKA ONLINE → WAJIB BUKTI
+    // ===============================
+    if ($request->metode == 'online') {
 
         $request->validate([
             'bukti' => 'required|image|max:2048'
@@ -264,12 +273,26 @@ class UserDashboardController extends Controller
 
         $p->update([
             'bukti_pembayaran' => $file,
-            'status_pembayaran' => 'menunggu'
+            'status_pembayaran' => 'menunggu',
+            'metode_pembayaran' => 'online'
         ]);
 
-        return back()->with('success', 'Bukti dikirim, tunggu verifikasi');
+        return back()->with('success', 'Bukti dikirim, tunggu konfirmasi petugas');
     }
 
+    // ===============================
+    // JIKA OFFLINE → TANPA BUKTI
+    // ===============================
+    if ($request->metode == 'offline') {
+
+        $p->update([
+            'status_pembayaran' => 'menunggu',
+            'metode_pembayaran' => 'offline'
+        ]);
+
+        return back()->with('success', 'Silakan bayar ke petugas, tunggu konfirmasi');
+    }
+}
     // ===============================
     // PROFILE
     // ===============================
@@ -289,7 +312,7 @@ class UserDashboardController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id,
             'no_telepon' => 'nullable|string|max:20',
             'alamat' => 'nullable|string|max:255',
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048', // max 2MB
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:20000', 
         ]);
 
         // Update semua field
