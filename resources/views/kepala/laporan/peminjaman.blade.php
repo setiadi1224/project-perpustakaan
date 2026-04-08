@@ -1,53 +1,167 @@
 @extends('kepala.layouts.app')
 
-@section('title', 'Laporan Peminjaman')
-
 @section('content')
+<style>
+    .container {
+        max-width: 900px;
+        margin: 20px auto;
+        font-family: Arial, sans-serif;
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    form.filter-form {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+    form.filter-form label {
+        font-weight: bold;
+    }
+    form.filter-form select {
+        padding: 5px 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+    form.filter-form button, form.filter-form a {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    form.filter-form button {
+        background-color: #007bff;
+        color: white;
+    }
+    form.filter-form a {
+        background-color: #ffc107;
+        color: black;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+    }
+    table th, table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    table th {
+        background-color: #f4f4f4;
+    }
+    table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    .badge {
+        padding: 3px 8px;
+        border-radius: 4px;
+        color: white;
+        font-size: 0.85em;
+    }
+    .badge-warning { background-color: orange; }
+    .badge-success { background-color: green; }
+    .badge-secondary { background-color: gray; }
+    .pagination {
+        display: flex;
+        list-style: none;
+        gap: 5px;
+        justify-content: center;
+        padding: 0;
+    }
+    .pagination li {
+        display: inline;
+    }
+    .pagination li a, .pagination li span {
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        text-decoration: none;
+        color: black;
+    }
+    .pagination li.active span {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+</style>
 
-<div class="card">
-<div style="margin-bottom:15px;">
-    <a href="{{ route('kepala.laporan.peminjaman.cetak') }}" target="_blank"
-        style="background:#2563eb;color:white;padding:8px 15px;border-radius:8px;text-decoration:none;">
-         Cetak PDF
-    </a>
-</div>
-    <table class="table-modern">
+<div class="container">
+    <h2>Laporan Peminjaman Buku</h2>
+
+    <!-- Filter Bulan & Tahun -->
+    <form action="{{ route('kepala.laporan.peminjaman') }}" method="GET" class="filter-form">
+        <div>
+            <label>Bulan:</label>
+            <select name="bulan">
+                @for($m=1;$m<=12;$m++)
+                    <option value="{{ $m }}" {{ $bulan==$m ? 'selected' : '' }}>
+                        {{ DateTime::createFromFormat('!m',$m)->format('F') }}
+                    </option>
+                @endfor
+            </select>
+        </div>
+
+        <div>
+            <label>Tahun:</label>
+            <select name="tahun">
+                @for($y = date('Y')-5; $y <= date('Y'); $y++)
+                    <option value="{{ $y }}" {{ $tahun==$y ? 'selected' : '' }}>
+                        {{ $y }}
+                    </option>
+                @endfor
+            </select>
+        </div>
+
+        <div>
+            <button type="submit">Filter</button>
+            <a href="{{ route('kepala.laporan.peminjaman.cetak', ['bulan'=>$bulan,'tahun'=>$tahun]) }}" target="_blank">Cetak PDF</a>
+        </div>
+    </form>
+
+    <!-- Table -->
+    <table>
         <thead>
             <tr>
+                <th>No</th>
                 <th>Nama</th>
                 <th>Buku</th>
-                <th>Tanggal</th>
+                <th>Tanggal Pinjam</th>
                 <th>Status</th>
             </tr>
         </thead>
-
         <tbody>
-            @forelse($data as $item)
+            @forelse($data as $i => $d)
             <tr>
-                <td>{{ $item->user->name }}</td>
-                <td>{{ $item->buku->judul }}</td>
-                <td>{{ $item->tanggal_pinjam }}</td>
+                <td>{{ $data->firstItem() + $i }}</td>
+                <td>{{ $d->user->name }}</td>
+                <td>{{ $d->buku->judul }}</td>
+                <td>{{ \Carbon\Carbon::parse($d->tanggal_pinjam)->format('d-m-Y') }}</td>
                 <td>
-                    @if($item->status == 'dipinjam')
-                        <span class="badge orange">Dipinjam</span>
-                    @elseif($item->status == 'dikembalikan')
-                        <span class="badge green">Selesai</span>
+                    @if($d->status == 'dipinjam')
+                        <span class="badge badge-warning">Dipinjam</span>
+                    @elseif($d->status == 'dikembalikan')
+                        <span class="badge badge-success">Selesai</span>
                     @else
-                        <span class="badge red">Menunggu</span>
+                        <span class="badge badge-secondary">Menunggu</span>
                     @endif
                 </td>
             </tr>
             @empty
             <tr>
-                <td colspan="4" style="text-align:center;">Tidak ada data</td>
+                <td colspan="5" style="text-align:center;">Tidak ada data</td>
             </tr>
             @endforelse
         </tbody>
     </table>
 
+    <!-- Pagination -->
     <div>
-{{ $data->links() }}
+        {{ $data->links() }}
     </div>
 </div>
-
 @endsection

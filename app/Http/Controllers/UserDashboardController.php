@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Buku;
 use App\Models\Kategori;
 use App\Models\Peminjaman;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class UserDashboardController extends Controller
 {
@@ -278,19 +279,42 @@ class UserDashboardController extends Controller
             'user' => Auth::user()
         ]);
     }
-
     public function updateProfile(Request $request)
     {
+
         $user = Auth::user();
 
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email,' . $user->id
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'no_telepon' => 'nullable|string|max:20',
+            'alamat' => 'nullable|string|max:255',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048', // max 2MB
         ]);
-/** @var \App\Models\User $user */
-$user = Auth::user();
-        $user->update($request->only('name', 'email'));
 
-        return back()->with('success', 'Profile updated');
+        // Update semua field
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->no_telepon = $request->no_telepon;
+        $user->alamat = $request->alamat;
+
+        // Jika user upload foto baru
+        if ($request->hasFile('foto')) {
+            // Hapus foto lama jika ada
+            if ($user->foto && Storage::exists('public/foto/' . $user->foto)) {
+                Storage::delete('public/foto/' . $user->foto);
+            }
+
+            // Simpan foto baru
+            $fotoName = time() . '_' . $request->file('foto')->getClientOriginalName();
+            $request->file('foto')->storeAs('public/foto', $fotoName);
+            $user->foto = $fotoName;
+        }
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        // Simpan ke database
+        $user->save();
+
+        return back()->with('success', 'Profile updated successfully!');
     }
 }

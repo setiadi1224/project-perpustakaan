@@ -149,7 +149,7 @@ tbody tr { border-top: 1px solid #e5e7eb; }
                         @if($item->denda > 0 && $item->status_pembayaran == 'belum')
                             <button class="btn-bayar"
                                 onclick="openModal({{ $item->id }}, {{ $item->denda }})">
-                                💳 Bayar
+                                 Bayar
                             </button>
                         @elseif($item->status_pembayaran == 'menunggu')
                             <span style="color:orange;">Menunggu verifikasi</span>

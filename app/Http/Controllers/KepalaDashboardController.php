@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Buku;
 use App\Models\Peminjaman;
 use App\Models\User;
+use Barryvdh\DomPDF\PDF;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class KepalaDashboardController extends Controller
 {
@@ -19,7 +20,7 @@ class KepalaDashboardController extends Controller
         $totalPeminjaman = Peminjaman::count();
         $totalDenda = Peminjaman::sum('denda');
 
-        $petugas = User::where('role', 'petugas')->latest()->get();
+        $petugas = User::where('role', 'petugas')->latest()->take(5)->get();
         $bukuPopuler = Buku::latest()->take(5)->get();
 
         return view('kepala.home', compact(
@@ -38,10 +39,10 @@ class KepalaDashboardController extends Controller
         $petugas = User::where('role', 'petugas')
             ->when($request->search, function ($q) use ($request) {
                 $q->where('name', 'like', "%{$request->search}%")
-                    ->orWhere('email', 'like', "%{$request->search}%");
+                  ->orWhere('email', 'like', "%{$request->search}%");
             })
             ->latest()
-            ->get();
+            ->paginate(10); // <-- paginate
 
         return view('kepala.petugas', compact('petugas'));
     }
@@ -69,15 +70,6 @@ class KepalaDashboardController extends Controller
         return back()->with('success', 'Petugas berhasil ditambahkan');
     }
 
-    // ================= DELETE PETUGAS =================
-    public function deletePetugas($id)
-    {
-        $petugas = User::where('role', 'petugas')->findOrFail($id);
-        $petugas->delete();
-
-        return back()->with('success', 'Petugas berhasil dihapus');
-    }
-
     // ================= UPDATE PETUGAS =================
     public function updatePetugas(Request $request, $id)
     {
@@ -97,40 +89,68 @@ class KepalaDashboardController extends Controller
             'no_telepon' => $request->no_telepon,
             'alamat' => $request->alamat,
         ];
+
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }
+
         $petugas->update($data);
         return back()->with('success', 'Petugas berhasil diupdate');
     }
-    public function laporanPeminjaman()
-{
-    $data = Peminjaman::with(['user','buku'])->latest()->paginate(10);
-    return view('kepala.laporan.peminjaman', compact('data'));
-}
 
-public function laporanDenda()
-{
-    $data = Peminjaman::with(['user','buku'])
-        ->where('denda','>',0)
-        ->latest()
-        ->paginate(10);
+    // ================= DELETE PETUGAS =================
+    public function deletePetugas($id)
+    {
+        $petugas = User::where('role', 'petugas')->findOrFail($id);
+        $petugas->delete();
 
-    return view('kepala.laporan.denda', compact('data'));
-}
+        return back()->with('success', 'Petugas berhasil dihapus');
+    }
 
-public function laporanAnggota()
-{
-    $data = User::where('role','user')->latest()->paginate(10);
-    return view('kepala.laporan.anggota', compact('data'));
-}
-public function cetakPeminjaman()
-{
-    $data = Peminjaman::with(['user','buku'])->latest()->get();
+    // ================= LAPORAN PEMINJAMAN =================
+    public function laporanPeminjaman(Request $request)
+    {
+        $bulan = $request->bulan ?? Carbon::now()->month;
+        $tahun = $request->tahun ?? Carbon::now()->year;
 
-    $pdf = Pdf::loadView('kepala.laporan.cetak_peminjaman', compact('data'))
-        ->setPaper('A4', 'portrait');
+        $query = Peminjaman::with(['user', 'buku'])
+            ->whereMonth('tanggal_pinjam', $bulan)
+            ->whereYear('tanggal_pinjam', $tahun);
 
-    return $pdf->stream('laporan_peminjaman.pdf');
-}
+        $data = $query->paginate(10); // <-- paginate
+
+        return view('kepala.laporan.peminjaman', compact('data', 'bulan', 'tahun'));
+    }
+
+    // ================= CETAK LAPORAN PEMINJAMAN =================
+     public function cetaklaporanPeminjaman(Request $request)
+    {
+        $bulan = $request->bulan ?? date('m');
+        $tahun = $request->tahun ?? date('Y');
+
+        $data = Peminjaman::with(['user', 'buku'])
+            ->whereMonth('tanggal_pinjam', $bulan)
+            ->whereYear('tanggal_pinjam', $tahun)
+            ->get();
+
+        $pdf = PDF::loadView('kepala.laporan.cetak_peminjaman', compact('data', 'bulan', 'tahun'));
+        return $pdf->stream('laporan-peminjaman-'.$bulan.'-'.$tahun.'.pdf');
+    }
+    // ================= LAPORAN DENDA =================
+    public function laporanDenda()
+    {
+        $data = Peminjaman::with(['user','buku'])
+            ->where('denda','>',0)
+            ->latest()
+            ->paginate(10);
+
+        return view('kepala.laporan.denda', compact('data'));
+    }
+
+    // ================= LAPORAN ANGGOTA =================
+    public function laporanAnggota()
+    {
+        $data = User::where('role','user')->latest()->paginate(10);
+        return view('kepala.laporan.anggota', compact('data'));
+    }
 }

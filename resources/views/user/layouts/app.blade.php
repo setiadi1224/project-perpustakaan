@@ -267,6 +267,9 @@
                 </svg>
                 <span>Profile</span>
             </a>
+            <a href="https://neal.fun/" class="nav-item">
+                Mini game
+            </a>
         </nav>
 
         <div class="sb-bottom">
