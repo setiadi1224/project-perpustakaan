@@ -14,36 +14,47 @@ class UserDashboardController extends Controller
 {
     //    dashboard
     public function home(Request $request)
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        $bukuDipinjam = Peminjaman::where('user_id', $user->id)
-            ->where('status', 'dipinjam')
-            ->sum('jumlah');
+    $bukuDipinjam = Peminjaman::where('user_id', $user->id)
+        ->where('status', 'dipinjam')
+        ->sum('jumlah');
 
-        $totalPeminjaman = Peminjaman::where('user_id', $user->id)->count();
-        $dendaAktif = Peminjaman::where('user_id', $user->id)
-            ->where('status_pembayaran', '!=', 'lunas')
-            ->sum('denda');
+    $totalPeminjaman = Peminjaman::where('user_id', $user->id)->count();
 
-        $kategoris = Kategori::all();
+    $dendaAktif = Peminjaman::where('user_id', $user->id)
+        ->where('status_pembayaran', '!=', 'lunas')
+        ->sum('denda');
 
-        $bukuPopuler = Buku::with('kategori')
-            ->when($request->kategori, function ($q) use ($request) {
-                $q->where('kategori_id', $request->kategori);
-            })
-            ->latest()
-            ->paginate(8)
-            ->appends($request->only('kategori'));
+    $kategoris = Kategori::all();
 
-        return view('user.home', compact(
-            'bukuDipinjam',
-            'totalPeminjaman',
-            'dendaAktif',
-            'kategoris',
-            'bukuPopuler'
-        ));
-    }
+   $trending = Buku::with('kategori')
+    ->withCount('peminjamans')
+    ->when($request->kategori, function ($q) use ($request) {
+        $q->where('kategori_id', $request->kategori);
+    })
+    ->orderBy('peminjamans_count', 'desc') 
+    ->take(10)
+    ->get();
+
+    $baru = Buku::with('kategori')
+        ->when($request->kategori, function ($q) use ($request) {
+            $q->where('kategori_id', $request->kategori);
+        })
+        ->latest()
+        ->take(10)
+        ->get();
+
+    return view('user.home', compact(
+        'bukuDipinjam',
+        'totalPeminjaman',
+        'dendaAktif',
+        'kategoris',
+        'trending',
+        'baru'
+    ));
+}
     // detail buku
     public function detailBuku($id)
     {
@@ -288,7 +299,6 @@ class UserDashboardController extends Controller
         $user->no_telepon = $request->no_telepon;
         $user->alamat = $request->alamat;
         if ($request->hasFile('foto')) {
-            // Hapus foto lama jika ada
             if ($user->foto && Storage::exists('public/foto/' . $user->foto)) {
                 Storage::delete('public/foto/' . $user->foto);
             }

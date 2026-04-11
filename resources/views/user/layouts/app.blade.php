@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Perpustakaan Digital')</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
         rel="stylesheet">
 
@@ -20,48 +20,31 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: #E8EAF0;
             min-height: 100vh;
-            display: flex;
+            overflow-x: hidden;
+            /* 🔥 FIX TEMBUS */
         }
 
-        /* SIDEBAR */
+        /* ================= SIDEBAR ================= */
         .sidebar {
             width: 160px;
-            min-height: 100vh;
+            height: 100vh;
             background: #0F172A;
-            display: flex;
-            flex-direction: column;
             position: fixed;
             top: 0;
             left: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         .sb-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 20px 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-        }
-
-        .brand-icon {
-            width: 30px;
-            height: 30px;
-            background: #2563EB;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .sb-brand span {
-            font-size: 18px;
-            font-weight: 600;
-            color: #fff;
+            padding: 20px;
+            color: white;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .sb-nav {
-            padding: 14px 10px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             gap: 6px;
@@ -69,14 +52,11 @@
         }
 
         .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
             padding: 10px;
-            border-radius: 10px;
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.55);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.6);
             text-decoration: none;
+            font-size: 14px;
             transition: 0.2s;
         }
 
@@ -87,47 +67,39 @@
 
         .nav-item.active {
             background: #2563EB;
-            color: #fff;
+            color: white;
         }
 
-        .nav-item.logout {
-            color: #ff6b6b;
-        }
-
+        /* LOGOUT */
         .sb-bottom {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
+            padding: 15px;
         }
 
-        .nav-item.logout {
+        .logout-btn {
             width: 100%;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
             background: rgba(239, 68, 68, 0.1);
             color: #f87171;
             border: none;
-            padding: 10px 12px;
-            border-radius: 10px;
             cursor: pointer;
             transition: 0.3s;
-            font-size: 14px;
         }
 
-        .nav-item.logout:hover {
+        .logout-btn:hover {
             background: #ef4444;
             color: white;
         }
 
-        /* MAIN */
+        /* ================= MAIN ================= */
         .main {
             margin-left: 160px;
-            flex: 1;
             padding: 24px;
+            overflow-x: hidden;
+            /* 🔥 FIX TEMBUS */
         }
 
+        /* ================= TOPBAR ================= */
         .topbar {
             display: flex;
             justify-content: flex-end;
@@ -138,46 +110,36 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            font-weight: 600;
-            color: #374151;
             background: #fff;
             padding: 6px 12px;
             border-radius: 999px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            font-weight: 600;
         }
 
-        /* AVATAR FIX */
+        /* AVATAR */
         .avatar {
             width: 36px;
             height: 36px;
             border-radius: 50%;
             overflow: hidden;
+            background: #2563EB;
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #2563EB;
-            color: #fff;
-            font-weight: 700;
-            flex-shrink: 0;
         }
 
         .avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
         }
 
-        .avatar span {
-            font-size: 13px;
-        }
-
-        @media (max-width: 580px) {
+        @media (max-width: 600px) {
             .sidebar {
                 width: 60px;
             }
 
-            .sb-brand span,
             .nav-item span {
                 display: none;
             }
@@ -192,11 +154,11 @@
 </head>
 
 <body>
+
     {{-- SIDEBAR --}}
     <aside class="sidebar">
-        <div class="sb-brand">
-            <span>Anggota</span>
-        </div>
+
+        <div class="sb-brand">Anggota</div>
 
         <nav class="sb-nav">
             <a href="{{ route('user.home') }}" class="nav-item {{ request()->routeIs('user.home') ? 'active' : '' }}">
@@ -223,26 +185,27 @@
             </a>
         </nav>
 
+        {{-- LOGOUT --}}
         <div class="sb-bottom">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="nav-item logout">
-                    <span>Logout</span>
+                <button class="logout-btn">
+                    Logout
                 </button>
             </form>
         </div>
+
     </aside>
 
     {{-- MAIN --}}
     <main class="main">
 
-        {{-- TOPBAR --}}
         <div class="topbar">
             <div class="user-pill">
 
                 <div class="avatar">
                     @if (auth()->user()->foto)
-                        <img src="{{ asset('storage/foto/' . auth()->user()->foto) }}" alt="avatar">
+                        <img src="{{ asset('storage/foto/' . auth()->user()->foto) }}">
                     @else
                         <span>{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
                     @endif
@@ -252,12 +215,10 @@
             </div>
         </div>
 
-        {{-- CONTENT --}}
         @yield('content')
 
     </main>
 
-    @stack('scripts')
 </body>
 
 </html>
