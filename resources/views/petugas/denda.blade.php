@@ -119,7 +119,7 @@
                     <tr>
                         <td>{{ $item->user->name }}</td>
                         <td>{{ $item->buku->judul }}</td>
-                        <td>{{ $item->terlambat }} Hari</td>
+                        <td>{{ (int) $item->terlambat }} Hari</td>
                         <td>Rp {{ number_format($item->total_denda, 0, ',', '.') }}</td>
 
                         {{-- METODE --}}

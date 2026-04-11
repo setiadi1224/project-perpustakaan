@@ -95,7 +95,7 @@ class PetugasDashboardController extends Controller
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $id,
-            'password' => 'nullable|min:6' // 🔥 opsional
+            'password' => 'nullable|min:6' 
         ]);
 
         $user = User::findOrFail($id);
@@ -142,20 +142,25 @@ class PetugasDashboardController extends Controller
     }
 
     public function storeBuku(Request $request)
-    {
-        $request->validate([
-            'judul' => 'required',
-            'penulis' => 'required',
-            'stok' => 'required|integer',
-            'kategori_id' => 'required|exists:kategoris,id',
-        ]);
+{
+    $request->validate([
+        'judul' => 'required',
+        'penulis' => 'required',
+        'stok' => 'required|integer',
+        'kategori_id' => 'required|exists:kategoris,id',
+        'cover' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+    ]);
 
-        $cover = $request->file('cover')?->store('buku', 'public');
+    $data = $request->all();
 
-        Buku::create($request->all() + ['cover' => $cover]);
-
-        return back()->with('success', 'Buku berhasil ditambahkan');
+    if ($request->hasFile('cover')) {
+        $data['cover'] = $request->file('cover')->store('buku', 'public');
     }
+
+    Buku::create($data);
+
+    return back()->with('success', 'Buku berhasil ditambahkan');
+}
 
     public function updateBuku(Request $request, $id)
     {

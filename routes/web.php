@@ -66,7 +66,7 @@ Route::middleware(['auth', 'role:petugas'])
         Route::post('/peminjaman/return/{id}', [PetugasDashboardController::class, 'returnBuku'])->name('peminjaman.return');
         Route::get('/denda', [PetugasDashboardController::class, 'denda'])->name('denda');
         Route::post('/denda/konfirmasi/{id}', [PetugasDashboardController::class, 'konfirmasi'])->name('konfirmasi');
-        Route::post('/denda/tolak/{id}', [PetugasDashboardController::class, 'tolakPembayaran'])->name('tolak');
+        Route::post('/denda/tolak/{id}', [PetugasDashboardController::class, 'tolak'])->name('tolak');
     });
 // kepala perpustakaan
 Route::middleware(['auth', 'role:kepala_perpustakaan'])
