@@ -19,35 +19,26 @@
             font-size: 13px;
         }
 
-        .alert.success {
-            background: rgba(34, 197, 94, 0.15);
+        .success {
+            background: rgba(34, 197, 94, .15);
             color: #4ade80;
-            border: 1px solid rgba(34, 197, 94, 0.3);
         }
 
-        .alert.error {
-            background: rgba(239, 68, 68, 0.15);
+        .error {
+            background: rgba(239, 68, 68, .15);
             color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
-        /* CARD DENDa */
+        /* CARD TOTAL */
         .card-denda {
             background: linear-gradient(135deg, #1e3a8a, #2563eb);
-            color: white;
             padding: 25px;
             border-radius: 18px;
             margin-bottom: 25px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
-        }
-
-        .card-denda h5 {
-            opacity: 0.9;
-            font-weight: 500;
         }
 
         .card-denda h2 {
-            font-size: 30px;
+            font-size: 28px;
             margin-top: 10px;
         }
 
@@ -56,41 +47,27 @@
             background: #1e293b;
             padding: 20px;
             border-radius: 18px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
-            border: 1px solid #334155;
             overflow-x: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 700px;
-        }
-
-        thead {
-            font-size: 12px;
-            text-transform: uppercase;
-            color: #94a3b8;
         }
 
         th,
         td {
             padding: 14px;
-            text-align: left;
+            font-size: 13px;
         }
 
         th {
+            color: #94a3b8;
             border-bottom: 1px solid #334155;
         }
 
         td {
             border-bottom: 1px solid #243244;
-            font-size: 13px;
-            color: #e5e7eb;
-        }
-
-        tbody tr:hover {
-            background: rgba(59, 130, 246, 0.06);
         }
 
         /* BADGE */
@@ -98,43 +75,78 @@
             padding: 5px 12px;
             border-radius: 999px;
             font-size: 11px;
-            font-weight: 500;
-            display: inline-block;
         }
 
         .merah {
-            background: rgba(239, 68, 68, 0.15);
+            background: rgba(239, 68, 68, .15);
             color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         .hijau {
-            background: rgba(34, 197, 94, 0.15);
+            background: rgba(34, 197, 94, .15);
             color: #4ade80;
-            border: 1px solid rgba(34, 197, 94, 0.3);
         }
 
         .orange {
-            background: rgba(245, 158, 11, 0.15);
+            background: rgba(245, 158, 11, .15);
             color: #fbbf24;
-            border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
         /* BUTTON */
         .btn-bayar {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white;
-            border: none;
+            background: #3b82f6;
             padding: 8px 14px;
             border-radius: 10px;
+            color: white;
+            border: none;
             cursor: pointer;
             font-size: 12px;
-            transition: 0.2s;
-            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.25);
         }
 
-        .btn-bayar:hover {
-            transform: translateY(-2px);
+        /* CARD MOBILE */
+        .card-list {
+            display: none;
+        }
+
+        /* ================= MOBILE ================= */
+        @media (max-width: 768px) {
+
+            .main-content {
+                padding: 15px;
+            }
+
+            /* HIDE TABLE */
+            table {
+                display: none;
+            }
+
+            /* SHOW CARD */
+            .card-list {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .card {
+                background: #1e293b;
+                padding: 15px;
+                border-radius: 14px;
+                border: 1px solid #334155;
+            }
+
+            .card h4 {
+                margin-bottom: 10px;
+            }
+
+            .card-item {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+
+            .card .btn-bayar {
+                width: 100%;
+                margin-top: 10px;
+            }
         }
 
         /* MODAL */
@@ -142,75 +154,73 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(6px);
+            background: rgba(0, 0, 0, .6);
             z-index: 999;
         }
 
         .modal-content {
             background: #1e293b;
-            width: 420px;
+            width: 400px;
             max-width: 90%;
-            margin: 6% auto;
-            padding: 25px;
-            border-radius: 18px;
-            border: 1px solid #334155;
-            animation: fadeIn 0.25s ease;
-            color: #e5e7eb;
-        }
-
-        @keyframes fadeIn {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-close {
-            float: right;
-            cursor: pointer;
-            font-size: 18px;
-            color: #94a3b8;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 15px;
         }
 
         select,
-        input[type="file"] {
+        input[type=file] {
             width: 100%;
             padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: #e5e7eb;
             margin-top: 5px;
+            border-radius: 10px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
         }
 
-        /* MODAL BUTTON */
         .modal-actions {
             display: flex;
             gap: 10px;
-            margin-top: 20px;
+            margin-top: 15px;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
         }
 
         .btn-primary {
-            flex: 1;
             background: #3b82f6;
             color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 10px;
         }
 
         .btn-secondary {
-            flex: 1;
             background: #334155;
-            color: #e5e7eb;
-            border: none;
-            border-radius: 10px;
+            color: white;
+        }
+
+        .qr-box {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .qr {
+            width: 120px;
+            height: auto;
+            display: block;
+            margin: 0 auto 8px;
+        }
+
+        .qr-text {
+            font-size: 12px;
+            color: #94a3b8;
         }
     </style>
 
@@ -221,76 +231,84 @@
             <div class="alert success">{{ session('success') }}</div>
         @endif
 
-        @if (session('error'))
-            <div class="alert error">{{ session('error') }}</div>
-        @endif
-
-        {{-- TOTAL CARD --}}
+        {{-- TOTAL --}}
         <div class="card-denda">
             <h5>Total Denda Aktif</h5>
             <h2>Rp {{ number_format($totalDenda, 0, ',', '.') }}</h2>
         </div>
 
-        {{-- TABLE --}}
+        {{-- TABLE DESKTOP --}}
         <div class="card-table">
             <table>
                 <thead>
                     <tr>
-                        <th>Judul Buku</th>
+                        <th>Judul</th>
                         <th>Terlambat</th>
-                        <th>Total Denda</th>
+                        <th>Denda</th>
                         <th>Status</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    @forelse($denda as $item)
+                    @foreach ($denda as $item)
                         <tr>
-                            <td>{{ $item->buku->judul ?? '-' }}</td>
-                            <td>{{ $item->terlambat ?? 0 }} Hari</td>
+                            <td>{{ $item->buku->judul }}</td>
+                            <td>{{ $item->terlambat }} Hari</td>
                             <td>Rp {{ number_format($item->denda, 0, ',', '.') }}</td>
-
+                            <td>
+                                <span
+                                    class="badge {{ $item->status_pembayaran == 'belum' ? 'merah' : ($item->status_pembayaran == 'menunggu' ? 'orange' : 'hijau') }}">
+                                    {{ $item->status_pembayaran }}
+                                </span>
+                            </td>
                             <td>
                                 @if ($item->status_pembayaran == 'belum')
-                                    <span class="badge merah">Belum</span>
-                                @elseif($item->status_pembayaran == 'menunggu')
-                                    <span class="badge orange">Menunggu</span>
-                                @else
-                                    <span class="badge hijau">Lunas</span>
-                                @endif
-                            </td>
-
-                            <td>
-                                @if ($item->denda > 0 && $item->status_pembayaran == 'belum')
-                                    <button class="btn-bayar" onclick="openModal({{ $item->id }}, {{ $item->denda }})">
+                                    <button class="btn-bayar" onclick="openModal({{ $item->id }},{{ $item->denda }})">
                                         Bayar
                                     </button>
-                                @elseif($item->status_pembayaran == 'menunggu')
-                                    <span style="color:#fbbf24;">Menunggu verifikasi</span>
                                 @else
-                                    <span style="color:#4ade80;">Lunas</span>
+                                    -
                                 @endif
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" style="text-align:center; color:#94a3b8;">
-                                Tidak ada denda
-                            </td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
+
+            {{-- CARD MOBILE --}}
+            <div class="card-list">
+                @foreach ($denda as $item)
+                    <div class="card">
+                        <h4>{{ $item->buku->judul }}</h4>
+
+                        <div class="card-item">⏱ Terlambat: {{ $item->terlambat }} Hari</div>
+                        <div class="card-item">💰 Denda: Rp {{ number_format($item->denda, 0, ',', '.') }}</div>
+
+                        <div class="card-item">
+                            Status:
+                            <span
+                                class="badge {{ $item->status_pembayaran == 'belum' ? 'merah' : ($item->status_pembayaran == 'menunggu' ? 'orange' : 'hijau') }}">
+                                {{ $item->status_pembayaran }}
+                            </span>
+                        </div>
+
+                        @if ($item->status_pembayaran == 'belum')
+                            <button class="btn-bayar" onclick="openModal({{ $item->id }},{{ $item->denda }})">
+                                Bayar
+                            </button>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+
         </div>
     </div>
 
     {{-- MODAL --}}
     <div id="modalBayar" class="modal" onclick="outsideClick(event)">
         <div class="modal-content">
-            <span class="modal-close" onclick="closeModal()">✖</span>
             <h3>Bayar Denda</h3>
-
             <h2 id="totalBayar">Rp 0</h2>
 
             <form id="formBayar" method="POST" enctype="multipart/form-data">
@@ -303,7 +321,12 @@
                     <option value="online">Online</option>
                 </select>
 
-                <div id="buktiField" style="display:none; margin-top:10px;">
+                <div id="buktiField" style="display:none;">
+
+                    <div class="qr-box">
+                        <img src="{{ asset('images/Qr.jpeg') }}" alt="qr" class="qr">
+                        <div class="qr-text">Scan untuk pembayaran</div>
+                    </div>
                     <label>Bukti</label>
                     <input type="file" name="bukti" id="bukti">
                 </div>
@@ -319,8 +342,7 @@
     <script>
         function openModal(id, denda) {
             document.getElementById('modalBayar').style.display = 'block';
-            document.getElementById('totalBayar').innerText =
-                'Rp ' + denda.toLocaleString('id-ID');
+            document.getElementById('totalBayar').innerText = 'Rp ' + denda.toLocaleString('id-ID');
 
             let url = "{{ route('user.bayar', ':id') }}";
             document.getElementById('formBayar').action = url.replace(':id', id);
@@ -338,13 +360,13 @@
             let metode = document.getElementById('metode').value;
             let box = document.getElementById('buktiField');
             let input = document.getElementById('bukti');
+
             if (metode === 'online') {
                 box.style.display = 'block';
                 input.required = true;
             } else {
                 box.style.display = 'none';
                 input.required = false;
-                input.value = "";
             }
         }
     </script>

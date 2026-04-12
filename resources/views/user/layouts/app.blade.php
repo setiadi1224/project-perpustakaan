@@ -21,7 +21,6 @@
             background: #E8EAF0;
             min-height: 100vh;
             overflow-x: hidden;
-            /* 🔥 FIX TEMBUS */
         }
 
         /* ================= SIDEBAR ================= */
@@ -34,6 +33,7 @@
             left: 0;
             display: flex;
             flex-direction: column;
+            transition: 0.3s;
         }
 
         .sb-brand {
@@ -95,18 +95,27 @@
         .main {
             margin-left: 160px;
             padding: 24px;
-            overflow-x: hidden;
-            /* 🔥 FIX TEMBUS */
+            transition: 0.3s;
         }
 
         /* ================= TOPBAR ================= */
         .topbar {
             display: flex;
-            justify-content: flex-end;
+            align-items: center;
             margin-bottom: 20px;
         }
 
+        .menu-toggle {
+            display: none;
+            font-size: 22px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
         .user-pill {
+            margin-left: auto;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -114,6 +123,7 @@
             padding: 6px 12px;
             border-radius: 999px;
             font-weight: 600;
+            color: black;
         }
 
         /* AVATAR */
@@ -135,17 +145,41 @@
             object-fit: cover;
         }
 
-        @media (max-width: 600px) {
-            .sidebar {
-                width: 60px;
+        /* OVERLAY */
+        .overlay {
+            display: none;
+        }
+
+        /*MOBILE*/
+        @media (max-width: 768px) {
+
+            .menu-toggle {
+                display: block;
+                color: white;
             }
 
-            .nav-item span {
-                display: none;
+            .sidebar {
+                left: -100%;
+                width: 200px;
+                z-index: 1000;
+                box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+            }
+
+            .sidebar.active {
+                left: 0;
             }
 
             .main {
-                margin-left: 60px;
+                margin-left: 0;
+                padding: 16px;
+            }
+
+            .overlay.active {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background: rgba(255, 255, 255, 0.4);
+                z-index: 900;
             }
         }
     </style>
@@ -155,30 +189,27 @@
 
 <body>
 
+    {{-- OVERLAY --}}
+    <div class="overlay" onclick="closeSidebar()"></div>
+
     {{-- SIDEBAR --}}
     <aside class="sidebar">
-
         <div class="sb-brand">Anggota</div>
-
         <nav class="sb-nav">
             <a href="{{ route('user.home') }}" class="nav-item {{ request()->routeIs('user.home') ? 'active' : '' }}">
                 <span>Home</span>
             </a>
-
             <a href="{{ route('user.library') }}"
                 class="nav-item {{ request()->routeIs('user.library') ? 'active' : '' }}">
                 <span>Library</span>
             </a>
-
             <a href="{{ route('user.riwayat') }}"
                 class="nav-item {{ request()->routeIs('user.riwayat') ? 'active' : '' }}">
                 <span>Riwayat</span>
             </a>
-
             <a href="{{ route('user.denda') }}" class="nav-item {{ request()->routeIs('user.denda') ? 'active' : '' }}">
                 <span>Denda</span>
             </a>
-
             <a href="{{ route('user.profile') }}"
                 class="nav-item {{ request()->routeIs('user.profile') ? 'active' : '' }}">
                 <span>Profile</span>
@@ -199,25 +230,34 @@
 
     {{-- MAIN --}}
     <main class="main">
-
         <div class="topbar">
+            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
             <div class="user-pill">
-
-                <div class="avatar">
-                    @if (auth()->user()->foto)
-                        <img src="{{ asset('storage/foto/' . auth()->user()->foto) }}">
-                    @else
-                        <span>{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
-                    @endif
-                </div>
-
+                <a href="{{ route('user.profile') }}">
+                    <div class="avatar">
+                        @if (auth()->user()->foto)
+                            <img src="{{ asset('storage/foto/' . auth()->user()->foto) }}">
+                        @else
+                            <span>{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                        @endif
+                    </div>
+                </a>
                 {{ auth()->user()->name }}
             </div>
         </div>
-
         @yield('content')
-
     </main>
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            document.querySelector('.sidebar').classList.remove('active');
+            document.querySelector('.overlay').classList.remove('active');
+        }
+    </script>
 
 </body>
 

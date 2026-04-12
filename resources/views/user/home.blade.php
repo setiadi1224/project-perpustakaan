@@ -128,6 +128,7 @@
             background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
             opacity: 0;
             transition: 0.3s;
+            color: white;
         }
 
         .buku-card:hover .buku-hover {
@@ -172,7 +173,7 @@
     </div>
 
     {{-- TRENDING --}}
-    <div class="sec-title">Trending</div>
+    <div class="sec-title">Populer</div>
     <div class="buku-row">
         @foreach ($trending as $buku)
             <a href="{{ route('user.buku.detail', $buku->id) }}" class="buku-card">
@@ -187,7 +188,7 @@
     </div>
 
     {{-- BARU --}}
-    <div class="sec-title">Baru Ditambahkan</div>
+    <div class="sec-title">Baru</div>
     <div class="buku-row">
         @foreach ($baru as $buku)
             <a href="{{ route('user.buku.detail', $buku->id) }}" class="buku-card">
