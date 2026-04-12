@@ -2,18 +2,39 @@
 
 @section('content')
     <style>
+        body {
+            background: #0f172a;
+            color: #e5e7eb;
+        }
+
         .main-content {
             padding: 25px;
         }
 
-        /* CARD */
+        /* ALERT */
+        .alert {
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .success {
+            background: rgba(34, 197, 94, .15);
+            color: #4ade80;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, .15);
+            color: #f87171;
+        }
+
+        /* CARD TOTAL */
         .card-denda {
-            background: linear-gradient(135deg, #3b82f6, #1e40af);
-            color: white;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
             padding: 25px;
-            border-radius: 16px;
+            border-radius: 18px;
             margin-bottom: 25px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
 
         .card-denda h2 {
@@ -23,10 +44,10 @@
 
         /* TABLE */
         .card-table {
-            background: #ffffff;
+            background: #1e293b;
             padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-radius: 18px;
+            overflow-x: auto;
         }
 
         table {
@@ -34,226 +55,282 @@
             border-collapse: collapse;
         }
 
-        thead {
-            background: #f3f4f6;
-            font-size: 13px;
-            text-transform: uppercase;
-        }
-
         th,
         td {
             padding: 14px;
+            font-size: 13px;
         }
 
-        tbody tr {
-            border-top: 1px solid #e5e7eb;
-            transition: 0.2s;
+        th {
+            color: #94a3b8;
+            border-bottom: 1px solid #334155;
         }
 
-        tbody tr:hover {
-            background: #f9fafb;
+        td {
+            border-bottom: 1px solid #243244;
         }
 
         /* BADGE */
         .badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: white;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 11px;
         }
 
         .merah {
-            background: #ef4444;
+            background: rgba(239, 68, 68, .15);
+            color: #f87171;
         }
 
         .hijau {
-            background: #10b981;
+            background: rgba(34, 197, 94, .15);
+            color: #4ade80;
         }
 
         .orange {
-            background: #f59e0b;
+            background: rgba(245, 158, 11, .15);
+            color: #fbbf24;
         }
 
         /* BUTTON */
         .btn-bayar {
-            background: linear-gradient(to right, #3b82f6, #2563eb);
+            background: #3b82f6;
+            padding: 8px 14px;
+            border-radius: 10px;
             color: white;
             border: none;
-            padding: 7px 14px;
-            border-radius: 10px;
             cursor: pointer;
-            font-size: 13px;
-            transition: 0.2s;
-            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+            font-size: 12px;
         }
 
-        .btn-bayar:hover {
-            transform: translateY(-2px);
+        /* CARD MOBILE */
+        .card-list {
+            display: none;
+        }
+
+        /* ================= MOBILE ================= */
+        @media (max-width: 768px) {
+
+            .main-content {
+                padding: 15px;
+            }
+
+            /* HIDE TABLE */
+            table {
+                display: none;
+            }
+
+            /* SHOW CARD */
+            .card-list {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .card {
+                background: #1e293b;
+                padding: 15px;
+                border-radius: 14px;
+                border: 1px solid #334155;
+            }
+
+            .card h4 {
+                margin-bottom: 10px;
+            }
+
+            .card-item {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+
+            .card .btn-bayar {
+                width: 100%;
+                margin-top: 10px;
+            }
         }
 
         /* MODAL */
         .modal {
             display: none;
             position: fixed;
-            z-index: 999;
             inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(6px);
+            background: rgba(0, 0, 0, .6);
+            z-index: 999;
         }
 
         .modal-content {
-            background: white;
-            width: 420px;
+            background: #1e293b;
+            width: 400px;
             max-width: 90%;
-            margin: 6% auto;
-            padding: 25px;
-            border-radius: 18px;
-            animation: fadeIn 0.3s ease;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 15px;
         }
 
-        @keyframes fadeIn {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-close {
-            float: right;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        /* INPUT */
         select,
-        input[type="file"] {
+        input[type=file] {
             width: 100%;
             padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #e5e7eb;
             margin-top: 5px;
+            border-radius: 10px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
         }
 
-        /* BUTTON MODAL */
         .modal-actions {
             display: flex;
             gap: 10px;
-            margin-top: 20px;
+            margin-top: 15px;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
         }
 
         .btn-primary {
-            flex: 1;
-            background: linear-gradient(to right, #3b82f6, #2563eb);
+            background: #3b82f6;
             color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 10px;
         }
 
         .btn-secondary {
-            flex: 1;
-            background: #e5e7eb;
-            padding: 10px;
-            border: none;
-            border-radius: 10px;
+            background: #334155;
+            color: white;
+        }
+
+        .qr-box {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .qr {
+            width: 120px;
+            height: auto;
+            display: block;
+            margin: 0 auto 8px;
+        }
+
+        .qr-text {
+            font-size: 12px;
+            color: #94a3b8;
         }
     </style>
 
     <div class="main-content">
 
+        {{-- ALERT --}}
         @if (session('success'))
-            <div style="background:#d1fae5; padding:10px; border-radius:8px; margin-bottom:10px;">
-                {{ session('success') }}
-            </div>
+            <div class="alert success">{{ session('success') }}</div>
         @endif
 
-        @if (session('error'))
-            <div style="background:#fee2e2; padding:10px; border-radius:8px; margin-bottom:10px;">
-                {{ session('error') }}
-            </div>
-        @endif
-
+        {{-- TOTAL --}}
         <div class="card-denda">
             <h5>Total Denda Aktif</h5>
             <h2>Rp {{ number_format($totalDenda, 0, ',', '.') }}</h2>
         </div>
 
+        {{-- TABLE DESKTOP --}}
         <div class="card-table">
             <table>
                 <thead>
                     <tr>
-                        <th>Judul Buku</th>
+                        <th>Judul</th>
                         <th>Terlambat</th>
-                        <th>Total Denda</th>
+                        <th>Denda</th>
                         <th>Status</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    @forelse($denda as $item)
+                    @foreach ($denda as $item)
                         <tr>
-                            <td>{{ $item->buku->judul ?? '-' }}</td>
-                            <td>{{ $item->terlambat ?? 0 }} Hari</td>
+                            <td>{{ $item->buku->judul }}</td>
+                            <td>{{ $item->terlambat }} Hari</td>
                             <td>Rp {{ number_format($item->denda, 0, ',', '.') }}</td>
                             <td>
-                                @if ($item->status_pembayaran == 'belum')
-                                    <span class="badge merah">Belum</span>
-                                @elseif($item->status_pembayaran == 'menunggu')
-                                    <span class="badge orange"> Menunggu</span>
-                                @else
-                                    <span class="badge hijau"> Lunas</span>
-                                @endif
+                                <span
+                                    class="badge {{ $item->status_pembayaran == 'belum' ? 'merah' : ($item->status_pembayaran == 'menunggu' ? 'orange' : 'hijau') }}">
+                                    {{ $item->status_pembayaran }}
+                                </span>
                             </td>
                             <td>
-                                @if ($item->denda > 0 && $item->status_pembayaran == 'belum')
-                                    <button class="btn-bayar" onclick="openModal({{ $item->id }}, {{ $item->denda }})">
+                                @if ($item->status_pembayaran == 'belum')
+                                    <button class="btn-bayar" onclick="openModal({{ $item->id }},{{ $item->denda }})">
                                         Bayar
                                     </button>
-                                @elseif($item->status_pembayaran == 'menunggu')
-                                    <span style="color:orange;">Menunggu verifikasi</span>
                                 @else
-                                    <span style="color:green;">Lunas</span>
+                                    -
                                 @endif
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" style="text-align:center;">Tidak ada denda</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
-        </div>
 
+            {{-- CARD MOBILE --}}
+            <div class="card-list">
+                @foreach ($denda as $item)
+                    <div class="card">
+                        <h4>{{ $item->buku->judul }}</h4>
+
+                        <div class="card-item">⏱ Terlambat: {{ $item->terlambat }} Hari</div>
+                        <div class="card-item">💰 Denda: Rp {{ number_format($item->denda, 0, ',', '.') }}</div>
+
+                        <div class="card-item">
+                            Status:
+                            <span
+                                class="badge {{ $item->status_pembayaran == 'belum' ? 'merah' : ($item->status_pembayaran == 'menunggu' ? 'orange' : 'hijau') }}">
+                                {{ $item->status_pembayaran }}
+                            </span>
+                        </div>
+
+                        @if ($item->status_pembayaran == 'belum')
+                            <button class="btn-bayar" onclick="openModal({{ $item->id }},{{ $item->denda }})">
+                                Bayar
+                            </button>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+
+        </div>
     </div>
 
-    <!-- MODAL -->
+    {{-- MODAL --}}
     <div id="modalBayar" class="modal" onclick="outsideClick(event)">
         <div class="modal-content">
-            <span class="modal-close" onclick="closeModal()">✖</span>
             <h3>Bayar Denda</h3>
-            <p style="font-size:13px; color:#6b7280;">
-                Pilih metode pembayaran. Jika online, upload bukti pembayaran.
-            </p>
             <h2 id="totalBayar">Rp 0</h2>
+
             <form id="formBayar" method="POST" enctype="multipart/form-data">
                 @csrf
-                <label>Metode Pembayaran</label>
+
+                <label>Metode</label>
                 <select name="metode" id="metode" onchange="toggleBukti()" required>
-                    <option value="">-- Pilih Metode --</option>
-                    <option value="offline">Bayar Offline</option>
-                    <option value="online">Bayar Online</option>
+                    <option value="">-- Pilih --</option>
+                    <option value="offline">Offline</option>
+                    <option value="online">Online</option>
                 </select>
-                <div id="buktiField" style="display:none; margin-top:10px;">
-                    <label>Upload Bukti</label>
+
+                <div id="buktiField" style="display:none;">
+
+                    <div class="qr-box">
+                        <img src="{{ asset('images/Qr.jpeg') }}" alt="qr" class="qr">
+                        <div class="qr-text">Scan untuk pembayaran</div>
+                    </div>
+                    <label>Bukti</label>
                     <input type="file" name="bukti" id="bukti">
                 </div>
+
                 <div class="modal-actions">
                     <button type="submit" class="btn-primary">Kirim</button>
                     <button type="button" class="btn-secondary" onclick="closeModal()">Batal</button>
@@ -265,37 +342,31 @@
     <script>
         function openModal(id, denda) {
             document.getElementById('modalBayar').style.display = 'block';
-            document.getElementById('totalBayar').innerText =
-                'Rp ' + denda.toLocaleString('id-ID');
+            document.getElementById('totalBayar').innerText = 'Rp ' + denda.toLocaleString('id-ID');
+
             let url = "{{ route('user.bayar', ':id') }}";
-            url = url.replace(':id', id);
-            document.getElementById('formBayar').action = url;
-            document.getElementById('metode').value = "";
-            document.getElementById('bukti').value = "";
-            document.getElementById('buktiField').style.display = 'none';
+            document.getElementById('formBayar').action = url.replace(':id', id);
         }
 
         function closeModal() {
             document.getElementById('modalBayar').style.display = 'none';
         }
 
-        function outsideClick(event) {
-            if (event.target.id === 'modalBayar') {
-                closeModal();
-            }
+        function outsideClick(e) {
+            if (e.target.id === 'modalBayar') closeModal();
         }
 
         function toggleBukti() {
             let metode = document.getElementById('metode').value;
-            let buktiField = document.getElementById('buktiField');
-            let buktiInput = document.getElementById('bukti');
+            let box = document.getElementById('buktiField');
+            let input = document.getElementById('bukti');
+
             if (metode === 'online') {
-                buktiField.style.display = 'block';
-                buktiInput.required = true;
+                box.style.display = 'block';
+                input.required = true;
             } else {
-                buktiField.style.display = 'none';
-                buktiInput.required = false;
-                buktiInput.value = "";
+                box.style.display = 'none';
+                input.required = false;
             }
         }
     </script>
