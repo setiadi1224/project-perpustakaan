@@ -1,14 +1,17 @@
 @extends('petugas.layouts.app')
+@section('title', 'Kelola Kategori')
 
 @section('content')
     <style>
-        .page-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
+        * {
+            box-sizing: border-box;
         }
 
-        /* CARD */
+        body {
+            overflow-x: hidden;
+        }
+
+        /* ================= CARD ================= */
         .card {
             background: #fff;
             padding: 20px;
@@ -16,7 +19,7 @@
             margin-bottom: 20px;
         }
 
-        /* INPUT */
+        /* ================= FORM ================= */
         .input-group {
             display: flex;
             gap: 10px;
@@ -38,7 +41,12 @@
             cursor: pointer;
         }
 
-        /* TABLE */
+        /* ================= TABLE ================= */
+        .table-wrapper {
+            width: 100%;
+            overflow: hidden;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -53,30 +61,126 @@
 
         td {
             padding: 12px 10px;
+            overflow: hidden;
         }
 
         tbody tr {
             border-top: 1px solid #e5e7eb;
         }
 
-        /* BUTTON */
+        /* ================= BUTTON ================= */
         .btn-delete {
             background: #ef4444;
             color: white;
             border: none;
-            padding: 6px 12px;
+            padding: 8px 14px;
             border-radius: 8px;
             cursor: pointer;
+            display: block;
+            margin: 8px auto 0 auto;
+            width: fit-content;
         }
 
-        /* EMPTY */
+        .btn-disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        td form {
+            width: 100%;
+            text-align: center;
+            margin: 0;
+        }
+
+        /* ================= EMPTY ================= */
         .empty {
             text-align: center;
             padding: 20px;
             color: #9ca3af;
         }
+
+        /* ================= PAGINATION ================= */
+        .pagination-wrapper {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* ================= RESPONSIVE ================= */
+        @media (max-width: 768px) {
+
+            .card {
+                padding: 15px;
+            }
+
+            h3 {
+                font-size: 18px;
+            }
+
+            h5 {
+                font-size: 16px;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .input-group button {
+                width: 100%;
+            }
+
+            table,
+            thead,
+            tbody,
+            tr,
+            td,
+            th {
+                display: block;
+                width: 100%;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tr {
+                background: #fff;
+                margin-bottom: 10px;
+                padding: 12px;
+                border-radius: 12px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+                overflow: hidden;
+            }
+
+            td {
+                padding: 8px 0;
+                border: none;
+            }
+
+            td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                display: block;
+                color: #6b7280;
+                font-size: 12px;
+                margin-bottom: 3px;
+            }
+
+            .btn-delete {
+                width: 100%;
+                max-width: 250px;
+                margin: 10px 0 0 0;
+            }
+
+            td form {
+                text-align: left;
+            }
+        }
     </style>
-    <h4 class="page-title">Kelola Kategori</h4>
+
+    <h3 class="page-title">Kelola Kategori</h3>
+
     {{-- FORM TAMBAH --}}
     <div class="card">
         <h5>Tambah Kategori</h5>
@@ -88,38 +192,63 @@
             </div>
         </form>
     </div>
+
     {{-- DATA --}}
     <div class="card">
         <h5>Data Kategori</h5>
-        <table>
-            <thead>
-                <tr>
-                    <th>Nama Kategori</th>
-                    <th width="120">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($data as $k)
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ $k->nama }}</td>
-                        <td>
-                            <form action="{{ route('petugas.kategori.delete', $k->id) }}" method="POST">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn-delete" onclick="return confirm('Hapus kategori ini?')">
-                                    Hapus
-                                </button>
-                            </form>
-                        </td>
+                        <th>Nama Kategori</th>
+                        <th width="120">Aksi</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="2" class="empty">
-                            Belum ada kategori
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+
+                <tbody>
+                    @forelse($data as $k)
+                        <tr>
+                            <td data-label="Nama Kategori">
+                                {{ $k->nama }}
+                                <br>
+                                <small style="color: gray;">
+                                    {{ $k->bukus_count }} buku
+                                </small>
+                            </td>
+
+                            <td data-label="Aksi">
+                                @if ($k->bukus_count > 0)
+                                    <button class="btn-delete btn-disabled" disabled>
+                                        Tidak bisa
+                                    </button>
+                                @else
+                                    <form action="{{ route('petugas.kategori.delete', $k->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button type="submit" class="btn-delete"
+                                            onclick="return confirm('Hapus kategori ini?')">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="2" class="empty">
+                                Belum ada kategori
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- PAGINATION --}}
+        <div class="pagination-wrapper">
+            {{ $data->links() }}
+        </div>
     </div>
 @endsection

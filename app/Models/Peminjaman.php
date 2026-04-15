@@ -15,6 +15,7 @@ class Peminjaman extends Model
         'tanggal_kembali',
         'tanggal_dikembalikan',
         'status',
+        'status_pengembalian',
         'denda',
         'bukti_pembayaran',
         'status_pembayaran',
@@ -30,6 +31,6 @@ class Peminjaman extends Model
     }
     public function buku()
     {
-        return $this->belongsTo(Buku::class);
+        return $this->belongsTo(Buku::class)->withTrashed();
     }
 }

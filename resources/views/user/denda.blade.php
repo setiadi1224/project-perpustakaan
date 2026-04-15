@@ -11,7 +11,6 @@
             padding: 25px;
         }
 
-        /* ALERT */
         .alert {
             padding: 10px 14px;
             border-radius: 10px;
@@ -29,7 +28,6 @@
             color: #f87171;
         }
 
-        /* CARD TOTAL */
         .card-denda {
             background: linear-gradient(135deg, #1e3a8a, #2563eb);
             padding: 25px;
@@ -42,7 +40,6 @@
             margin-top: 10px;
         }
 
-        /* TABLE */
         .card-table {
             background: #1e293b;
             padding: 20px;
@@ -70,7 +67,6 @@
             border-bottom: 1px solid #243244;
         }
 
-        /* BADGE */
         .badge {
             padding: 5px 12px;
             border-radius: 999px;
@@ -92,7 +88,6 @@
             color: #fbbf24;
         }
 
-        /* BUTTON */
         .btn-bayar {
             background: #3b82f6;
             padding: 8px 14px;
@@ -103,24 +98,19 @@
             font-size: 12px;
         }
 
-        /* CARD MOBILE */
         .card-list {
             display: none;
         }
 
-        /* ================= MOBILE ================= */
         @media (max-width: 768px) {
-
             .main-content {
                 padding: 15px;
             }
 
-            /* HIDE TABLE */
             table {
                 display: none;
             }
 
-            /* SHOW CARD */
             .card-list {
                 display: flex;
                 flex-direction: column;
@@ -132,10 +122,6 @@
                 padding: 15px;
                 border-radius: 14px;
                 border: 1px solid #334155;
-            }
-
-            .card h4 {
-                margin-bottom: 10px;
             }
 
             .card-item {
@@ -184,22 +170,22 @@
             margin-top: 15px;
         }
 
-        .btn-primary,
-        .btn-secondary {
-            flex: 1;
-            padding: 10px;
-            border-radius: 10px;
-            border: none;
-        }
-
         .btn-primary {
             background: #3b82f6;
             color: white;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            flex: 1;
         }
 
         .btn-secondary {
             background: #334155;
             color: white;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            flex: 1;
         }
 
         .qr-box {
@@ -213,9 +199,7 @@
 
         .qr {
             width: 120px;
-            height: auto;
-            display: block;
-            margin: 0 auto 8px;
+            margin-bottom: 8px;
         }
 
         .qr-text {
@@ -237,7 +221,7 @@
             <h2>Rp {{ number_format($totalDenda, 0, ',', '.') }}</h2>
         </div>
 
-        {{-- TABLE DESKTOP --}}
+        {{-- TABLE --}}
         <div class="card-table">
             <table>
                 <thead>
@@ -254,17 +238,31 @@
                     @foreach ($denda as $item)
                         <tr>
                             <td>{{ $item->buku->judul }}</td>
-                            <td>{{ $item->terlambat }} Hari</td>
-                            <td>Rp {{ number_format($item->denda, 0, ',', '.') }}</td>
+
+                            <td>
+                                {{ $item->status == 'dikembalikan' ? 0 : $item->terlambat }} Hari
+                            </td>
+
+                            <td>
+                                Rp {{ number_format($item->total_denda, 0, ',', '.') }}
+                            </td>
+
                             <td>
                                 <span
-                                    class="badge {{ $item->status_pembayaran == 'belum' ? 'merah' : ($item->status_pembayaran == 'menunggu' ? 'orange' : 'hijau') }}">
+                                    class="badge 
+                        {{ $item->status_pembayaran == 'belum'
+                            ? 'merah'
+                            : ($item->status_pembayaran == 'menunggu'
+                                ? 'orange'
+                                : 'hijau') }}">
                                     {{ $item->status_pembayaran }}
                                 </span>
                             </td>
+
                             <td>
-                                @if ($item->status_pembayaran == 'belum')
-                                    <button class="btn-bayar" onclick="openModal({{ $item->id }},{{ $item->denda }})">
+                                @if ($item->status_pembayaran == 'belum' && $item->total_denda > 0)
+                                    <button class="btn-bayar"
+                                        onclick="openModal({{ $item->id }}, {{ $item->total_denda }})">
                                         Bayar
                                     </button>
                                 @else
@@ -276,32 +274,41 @@
                 </tbody>
             </table>
 
-            {{-- CARD MOBILE --}}
+            {{-- MOBILE --}}
             <div class="card-list">
                 @foreach ($denda as $item)
                     <div class="card">
                         <h4>{{ $item->buku->judul }}</h4>
 
-                        <div class="card-item">⏱ Terlambat: {{ $item->terlambat }} Hari</div>
-                        <div class="card-item">💰 Denda: Rp {{ number_format($item->denda, 0, ',', '.') }}</div>
+                        <div class="card-item">
+                            ⏱ Terlambat: {{ $item->status == 'dikembalikan' ? 0 : $item->terlambat }} Hari
+                        </div>
+
+                        <div class="card-item">
+                            💰 Denda: Rp {{ number_format($item->total_denda, 0, ',', '.') }}
+                        </div>
 
                         <div class="card-item">
                             Status:
                             <span
-                                class="badge {{ $item->status_pembayaran == 'belum' ? 'merah' : ($item->status_pembayaran == 'menunggu' ? 'orange' : 'hijau') }}">
+                                class="badge 
+                    {{ $item->status_pembayaran == 'belum'
+                        ? 'merah'
+                        : ($item->status_pembayaran == 'menunggu'
+                            ? 'orange'
+                            : 'hijau') }}">
                                 {{ $item->status_pembayaran }}
                             </span>
                         </div>
 
-                        @if ($item->status_pembayaran == 'belum')
-                            <button class="btn-bayar" onclick="openModal({{ $item->id }},{{ $item->denda }})">
+                        @if ($item->status_pembayaran == 'belum' && $item->total_denda > 0)
+                            <button class="btn-bayar" onclick="openModal({{ $item->id }}, {{ $item->total_denda }})">
                                 Bayar
                             </button>
                         @endif
                     </div>
                 @endforeach
             </div>
-
         </div>
     </div>
 
@@ -322,11 +329,11 @@
                 </select>
 
                 <div id="buktiField" style="display:none;">
-
                     <div class="qr-box">
-                        <img src="{{ asset('images/Qr.jpeg') }}" alt="qr" class="qr">
+                        <img src="{{ asset('images/Qr.jpeg') }}" class="qr">
                         <div class="qr-text">Scan untuk pembayaran</div>
                     </div>
+
                     <label>Bukti</label>
                     <input type="file" name="bukti" id="bukti">
                 </div>
@@ -339,9 +346,16 @@
         </div>
     </div>
 
+    {{-- PAGINATION --}}
+    <div style="margin-top:15px;">
+        {{ $denda->links() }}
+    </div>
+
     <script>
         function openModal(id, denda) {
             document.getElementById('modalBayar').style.display = 'block';
+
+            denda = parseInt(denda);
             document.getElementById('totalBayar').innerText = 'Rp ' + denda.toLocaleString('id-ID');
 
             let url = "{{ route('user.bayar', ':id') }}";

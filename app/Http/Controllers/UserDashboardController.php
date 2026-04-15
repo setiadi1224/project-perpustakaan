@@ -12,75 +12,107 @@ use Illuminate\Support\Facades\Storage;
 
 class UserDashboardController extends Controller
 {
-    //    dashboard
+    // dashboard
     public function home(Request $request)
-{
-    $user = Auth::user();
-
-    $bukuDipinjam = Peminjaman::where('user_id', $user->id)
-        ->where('status', 'dipinjam')
-        ->sum('jumlah');
-
-    $totalPeminjaman = Peminjaman::where('user_id', $user->id)->count();
-
-    $dendaAktif = Peminjaman::where('user_id', $user->id)
-        ->where('status_pembayaran', '!=', 'lunas')
-        ->sum('denda');
-
-    $kategoris = Kategori::all();
-
-   $trending = Buku::with('kategori')
-    ->withCount('peminjamans')
-    ->when($request->kategori, function ($q) use ($request) {
-        $q->where('kategori_id', $request->kategori);
-    })
-    ->orderBy('peminjamans_count', 'desc') 
-    ->take(10)
-    ->get();
-
-    $baru = Buku::with('kategori')
-        ->when($request->kategori, function ($q) use ($request) {
-            $q->where('kategori_id', $request->kategori);
-        })
-        ->latest()
-        ->take(10)
-        ->get();
-
-    return view('user.home', compact(
-        'bukuDipinjam',
-        'totalPeminjaman',
-        'dendaAktif',
-        'kategoris',
-        'trending',
-        'baru'
-    ));
-}
-    // detail buku
-    public function detailBuku($id)
     {
-        $buku = Buku::with('kategori')->findOrFail($id);
+        $user = Auth::user();
 
-        $rekomendasi = Buku::where('id', '!=', $id)
-            ->latest()
-            ->take(4)
+        $bukuDipinjam = Peminjaman::where('user_id', $user->id)
+            ->where('status', 'dipinjam')
+            ->sum('jumlah');
+
+        $totalPeminjaman = Peminjaman::where('user_id', $user->id)->count();
+
+        $dendaAktif = Peminjaman::where('user_id', $user->id)
+            ->where('status_pembayaran', '!=', 'lunas')
+            ->sum('denda');
+
+        $kategoris = Kategori::all();
+
+        $trending = Buku::with('kategori')
+            ->withCount('peminjamans')
+            ->when($request->kategori, fn($q) => $q->where('kategori_id', $request->kategori))
+            ->orderBy('peminjamans_count', 'desc')
+            ->take(10)
             ->get();
 
-        $pinjaman = Peminjaman::where('user_id', Auth::id())
-            ->where('buku_id', $id)
-            ->whereIn('status', ['menunggu', 'dipinjam'])
-            ->first();
+        $baru = Buku::with('kategori')
+            ->when($request->kategori, fn($q) => $q->where('kategori_id', $request->kategori))
+            ->latest()
+            ->take(10)
+            ->get();
 
-        return view('user.detail_buku', compact(
-            'buku',
-            'rekomendasi',
-            'pinjaman'
+        return view('user.home', compact(
+            'bukuDipinjam',
+            'totalPeminjaman',
+            'dendaAktif',
+            'kategoris',
+            'trending',
+            'baru'
         ));
     }
-    //pinjam buku
+
+    //  HALAMAN PENGEMBALIAN USER
+    public function pengembalian()
+    {
+        $data = Peminjaman::with('buku')
+            ->where('user_id', Auth::id())
+            ->where('status', 'dipinjam')
+            ->latest()
+            ->paginate(5);
+
+        return view('user.pengembalian', compact('data'));
+    }
+
+    //  AJUKAN PENGEMBALIAN
+
+    public function returnBuku($id)
+    {
+        $p = Peminjaman::findOrFail($id);
+
+        if ($p->user_id != Auth::id()) {
+            return back()->with('error', 'Akses ditolak');
+        }
+
+        if ($p->status != 'dipinjam') {
+            return back()->with('error', 'Tidak valid');
+        }
+
+        if ($p->status_pengembalian && $p->status_pengembalian === 'menunggu') {
+            return back()->with('error', 'Sudah diajukan sebelumnya');
+        }
+
+        $p->update([
+            'status_pengembalian' => 'menunggu'
+        ]);
+
+        return back()->with('success', 'Menunggu konfirmasi petugas');
+    }
+
+    // =========================
+    // library
+    // =========================
+    public function library(Request $request)
+    {
+        $books = Buku::with('kategori')
+            ->when($request->search, function ($q) use ($request) {
+                $q->where(function ($qq) use ($request) {
+                    $qq->where('judul', 'like', "%{$request->search}%")
+                        ->orWhere('penulis', 'like', "%{$request->search}%");
+                });
+            })
+            ->when($request->kategori, fn($q) => $q->where('kategori_id', $request->kategori))
+            ->paginate(20)
+            ->withQueryString();
+
+        $kategoris = Kategori::all();
+
+        return view('user.library', compact('books', 'kategoris'));
+    }
     public function pinjam(Request $request, $id)
     {
         $request->validate([
-            'jumlah' => 'required|integer|min:1|max:5'
+            'jumlah' => 'required|integer|min:1|max:5',
         ]);
 
         $userId = Auth::id();
@@ -97,7 +129,7 @@ class UserDashboardController extends Controller
             ->first();
 
         if ($cek) {
-            return back()->with('error', 'Kamu sudah meminjam / menunggu buku ini');
+            return back()->with('error', 'Sudah meminjam buku ini');
         }
 
         $totalDipinjam = Peminjaman::where('user_id', $userId)
@@ -108,78 +140,34 @@ class UserDashboardController extends Controller
             return back()->with('error', 'Maksimal 5 buku');
         }
 
+        $buku->decrement('stok', $jumlah);
+
         Peminjaman::create([
             'user_id' => $userId,
             'buku_id' => $id,
             'jumlah' => $jumlah,
             'status' => 'menunggu',
+            'status_pengembalian' => 'belum',
             'tanggal_pinjam' => now(),
         ]);
 
-        return back()->with('success', 'Menunggu persetujuan petugas');
+        return back()->with('success', 'Menunggu persetujuan');
     }
-
-    //return buku
-    public function returnBuku($id)
+    public function detailBuku($id)
     {
-        $p = Peminjaman::with('buku')->findOrFail($id);
+        $buku = Buku::with('kategori')->findOrFail($id);
 
-        if ($p->user_id != Auth::id()) {
-            return back()->with('error', 'Akses ditolak');
-        }
+        $rekomendasi = Buku::where('id', '!=', $id)->latest()->take(4)->get();
 
-        if ($p->status != 'dipinjam') {
-            return back()->with('error', 'Tidak valid');
-        }
+        $pinjaman = Peminjaman::where('user_id', Auth::id())
+            ->where('buku_id', $id)
+            ->whereIn('status', ['menunggu', 'dipinjam'])
+            ->first();
 
-        $today = now();
-        $batas = Carbon::parse($p->tanggal_kembali);
-
-        $terlambat = $today->gt($batas)
-            ? $batas->diffInDays($today)
-            : 0;
-
-        $denda = 0;
-
-        if ($terlambat > 0) {
-            $dendaPerHari = 5000;
-            $denda = $terlambat * $dendaPerHari * $p->jumlah;
-        }
-
-        $p->update([
-            'status' => 'dikembalikan',
-            'tanggal_dikembalikan' => $today,
-            'denda' => $denda,
-            'status_pembayaran' => $denda > 0 ? 'belum' : 'lunas'
-        ]);
-
-        $p->buku->increment('stok', $p->jumlah);
-
-        return back()->with('success', 'Buku dikembalikan');
+        return view('user.detail_buku', compact('buku', 'rekomendasi', 'pinjaman'));
     }
 
-    // library
-    public function library(Request $request)
-    {
-        $books = Buku::with('kategori')
-            ->when($request->search, function ($q) use ($request) {
-                $q->where(function ($qq) use ($request) {
-                    $qq->where('judul', 'like', "%{$request->search}%")
-                        ->orWhere('penulis', 'like', "%{$request->search}%");
-                });
-            })
-            ->when($request->kategori, function ($q) use ($request) {
-                $q->where('kategori_id', $request->kategori);
-            })
-            ->paginate(10)
-            ->withQueryString();
-
-        $kategoris = Kategori::all();
-
-        return view('user.library', compact('books', 'kategoris'));
-    }
-
-    //riwayat
+    // riwayat
     public function riwayat(Request $request)
     {
         $query = Peminjaman::with('buku')
@@ -198,7 +186,7 @@ class UserDashboardController extends Controller
         return view('user.riwayat', compact('riwayats'));
     }
 
-    //denda
+    // denda
     public function denda()
     {
         $denda = Peminjaman::with('buku')
@@ -211,17 +199,22 @@ class UserDashboardController extends Controller
 
         foreach ($denda as $item) {
 
-            $batas = Carbon::parse($item->tanggal_kembali);
-            $terlambat = 0;
+            $terlambat = $item->terlambat;
             $dendaFix = $item->denda;
 
-            if ($item->status == 'dipinjam' && now()->gt($batas)) {
-                $terlambat = $batas->diffInDays(now());
-                $dendaFix = $terlambat * 5000 * $item->jumlah;
+            if ($item->status == 'dipinjam') {
+                $batas = Carbon::parse($item->tanggal_kembali);
+
+                if (now()->gt($batas)) {
+                    $terlambat = $batas->diffInDays(now());
+                    $dendaFix = $terlambat * 5000 * $item->jumlah;
+                }
             }
+
             if ($item->status_pembayaran == 'lunas') {
                 $dendaFix = 0;
             }
+
             $item->terlambat = $terlambat;
             $item->total_denda = $dendaFix;
 
@@ -231,7 +224,7 @@ class UserDashboardController extends Controller
         return view('user.denda', compact('denda', 'totalDenda'));
     }
 
-    //bayar denda
+    // bayar denda
     public function bayar(Request $request, $id)
     {
         $p = Peminjaman::findOrFail($id);
@@ -245,13 +238,12 @@ class UserDashboardController extends Controller
         }
 
         $request->validate([
-            'metode' => 'required|in:offline,online'
+            'metode' => 'required|in:offline,online',
         ]);
 
         if ($request->metode == 'online') {
-
             $request->validate([
-                'bukti' => 'required|image|max:2048'
+                'bukti' => 'required|image|max:2048',
             ]);
 
             $file = $request->file('bukti')->store('bukti', 'public');
@@ -259,32 +251,32 @@ class UserDashboardController extends Controller
             $p->update([
                 'bukti_pembayaran' => $file,
                 'status_pembayaran' => 'menunggu',
-                'metode_pembayaran' => 'online'
+                'metode_pembayaran' => 'online',
             ]);
 
-            return back()->with('success', 'Bukti dikirim, tunggu konfirmasi petugas');
+            return back()->with('success', 'Bukti dikirim');
         }
 
         if ($request->metode == 'offline') {
-
             $p->update([
                 'status_pembayaran' => 'menunggu',
-                'metode_pembayaran' => 'offline'
+                'metode_pembayaran' => 'offline',
             ]);
 
-            return back()->with('success', 'Silakan bayar ke petugas, tunggu konfirmasi');
+            return back()->with('success', 'Silakan bayar ke petugas');
         }
     }
-    //profile
+
+    // profile
     public function profile()
     {
         return view('user.profile', [
-            'user' => Auth::user()
+            'user' => Auth::user(),
         ]);
     }
+
     public function updateProfile(Request $request)
     {
-
         $user = Auth::user();
 
         $request->validate([
@@ -292,22 +284,23 @@ class UserDashboardController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id,
             'no_telepon' => 'nullable|string|max:20',
             'alamat' => 'nullable|string|max:255',
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:20000',
+            'foto' => 'nullable|image|max:20000',
         ]);
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->no_telepon = $request->no_telepon;
-        $user->alamat = $request->alamat;
+
+        $user->update($request->only('name', 'email', 'no_telepon', 'alamat'));
+
         if ($request->hasFile('foto')) {
             if ($user->foto && Storage::exists('public/foto/' . $user->foto)) {
                 Storage::delete('public/foto/' . $user->foto);
             }
+
             $fotoName = time() . '_' . $request->file('foto')->getClientOriginalName();
             $request->file('foto')->storeAs('public/foto', $fotoName);
+
             $user->foto = $fotoName;
+            $user->save();
         }
-        $user = Auth::user();
-        $user->save();
-        return back()->with('success', 'Profile updated successfully!');
+
+        return back()->with('success', 'Profile updated!');
     }
 }
