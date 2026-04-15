@@ -10,14 +10,12 @@
             overflow-x: hidden;
         }
 
-        /* ================= TITLE ================= */
         .page-title {
             font-size: 20px;
             font-weight: 700;
             margin-bottom: 20px;
         }
 
-        /* ================= BOX ================= */
         .table-box {
             background: #fff;
             padding: 20px;
@@ -25,7 +23,6 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
         }
 
-        /* ================= HEADER ================= */
         .header {
             display: flex;
             justify-content: space-between;
@@ -38,7 +35,6 @@
             border: 1px solid #ddd;
         }
 
-        /* ================= TABLE ================= */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -56,7 +52,6 @@
             color: #6B7280;
         }
 
-        /* ================= BADGE ================= */
         .badge {
             padding: 5px 12px;
             border-radius: 20px;
@@ -66,28 +61,6 @@
 
         .waiting {
             background: orange;
-        }
-
-        .borrowed {
-            background: #3b82f6;
-        }
-
-        .late {
-            background: #ef4444;
-        }
-
-        .done {
-            background: #10b981;
-        }
-
-        .rejected {
-            background: #6b7280;
-        }
-
-        /* ================= BUTTON ================= */
-        .action-group {
-            display: flex;
-            gap: 6px;
         }
 
         .btn {
@@ -103,27 +76,23 @@
             color: white;
         }
 
-        .btn.blue {
-            background: #3b82f6;
-            color: white;
-        }
-
         .btn.red {
             background: #ef4444;
             color: white;
         }
 
-        /* ================= PAGINATION ================= */
+        .action-group {
+            display: flex;
+            gap: 6px;
+        }
+
         .pagination-wrapper {
             margin-top: 15px;
             display: flex;
             justify-content: center;
         }
 
-        /* ================= RESPONSIVE ================= */
         @media (max-width: 768px) {
-
-            /* header */
             .header {
                 flex-direction: column;
                 gap: 10px;
@@ -175,12 +144,11 @@
 
             .btn {
                 width: 100%;
-                text-align: center;
             }
         }
     </style>
 
-    <h4 class="page-title">Kelola Peminjaman</h4>
+    <h4 class="page-title">Pengembalian Buku</h4>
 
     <div class="table-box">
 
@@ -205,58 +173,30 @@
 
             <tbody>
                 @forelse ($data as $item)
-                    @php
-                        $hari = $item->tanggal_pinjam
-                            ? \Carbon\Carbon::parse($item->tanggal_pinjam)->diffInDays(now())
-                            : 0;
-
-                        $terlambat = $item->status == 'dipinjam' && $hari > 7;
-                    @endphp
-
                     <tr>
                         <td data-label="Nama">{{ $item->user->name }}</td>
                         <td data-label="Buku">{{ $item->buku->judul }}</td>
 
                         <td data-label="Tgl Pinjam">
-                            {{ $item->tanggal_pinjam ? \Carbon\Carbon::parse($item->tanggal_pinjam)->format('d M Y') : '-' }}
+                            {{ \Carbon\Carbon::parse($item->tanggal_pinjam)->format('d M Y') }}
                         </td>
 
                         <td data-label="Tgl Kembali">
-                            {{ $item->tanggal_kembali ? \Carbon\Carbon::parse($item->tanggal_kembali)->format('d M Y') : '-' }}
+                            {{ \Carbon\Carbon::parse($item->tanggal_kembali)->format('d M Y') }}
                         </td>
 
                         <td data-label="Status">
-                            @if ($item->status == 'menunggu')
-                                <span class="badge waiting">Menunggu</span>
-                            @elseif($item->status == 'dipinjam' && $terlambat)
-                                <span class="badge late">Terlambat</span>
-                            @elseif($item->status == 'dipinjam')
-                                <span class="badge borrowed">Dipinjam</span>
-                            @elseif($item->status == 'dikembalikan')
-                                <span class="badge done">Selesai</span>
-                            @elseif($item->status == 'ditolak')
-                                <span class="badge rejected">Ditolak</span>
-                            @endif
+                            <span class="badge waiting">Menunggu Konfirmasi</span>
                         </td>
 
                         <td data-label="Aksi">
                             <div class="action-group">
 
-                                @if ($item->status == 'menunggu')
-                                    <form action="{{ route('petugas.peminjaman.approve', $item->id) }}" method="POST">
-                                        @csrf
-                                        <button class="btn green">Approve</button>
-                                    </form>
-
-                                    <form action="{{ route('petugas.peminjaman.tolak', $item->id) }}" method="POST">
-                                        @csrf
-                                        <button class="btn red">Tolak</button>
-                                    </form>
-                                @endif
-
-                                @if ($item->status == 'dipinjam')
-                                   -
-                                @endif
+                                {{-- APPROVE --}}
+                                <form action="{{ route('petugas.pengembalian.approve', $item->id) }}" method="POST">
+                                    @csrf
+                                    <button class="btn green">Approve</button>
+                                </form>
 
                             </div>
                         </td>

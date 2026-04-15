@@ -1,7 +1,5 @@
 @extends('petugas.layouts.app')
 
-@section('title', 'Kelola Buku')
-
 @section('content')
 
     <style>
@@ -81,70 +79,6 @@
             cursor: pointer;
         }
 
-        /* PAGINATION */
-        .pagination-wrapper {
-            display: flex;
-            justify-content: center;
-            margin-top: 25px;
-        }
-
-        .pagination {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .pagination li {
-            list-style: none;
-        }
-
-        .pagination a,
-        .pagination span {
-            min-width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
-            text-decoration: none;
-            border: 1px solid #e2e8f0;
-            background: #ffffff;
-            color: #334155;
-            transition: all 0.2s ease;
-        }
-
-        /* hover effect */
-        .pagination a:hover {
-            background: #2563eb;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
-        }
-
-        /* active */
-        .pagination .active span {
-            background: linear-gradient(135deg, #2563eb, #1e40af);
-            color: white;
-            border: none;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-        }
-
-        /* disabled */
-        .pagination .disabled span {
-            background: #f1f5f9;
-            color: #94a3b8;
-            cursor: not-allowed;
-        }
-
-        /* prev next icon */
-        .pagination li:first-child a,
-        .pagination li:last-child a {
-            font-weight: bold;
-        }
-
-        /* MODAL */
         .modal {
             display: none;
             position: fixed;
@@ -172,20 +106,26 @@
             border: 1px solid #ddd;
         }
     </style>
+
     <div class="header">
-        <h1>Kelola Buku</h1>
-        {{-- search --}}
+        <h3>Kelola Buku</h3>
         <div class="actions">
-            <form method="GET" action="{{ url()->current() }}">
+            <form method="GET">
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Search...">
             </form>
-            <button type="button" class="btn" onclick="openModal()">+ Tambah</button>
+            <button class="btn" onclick="openModal()">Tambah</button>
         </div>
     </div>
 
     @if (session('success'))
         <div style="background:#dcfce7;padding:10px;border-radius:8px;margin-bottom:10px;">
             {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div style="background:#fee2e2;padding:10px;border-radius:8px;margin-bottom:10px;">
+            {{ session('error') }}
         </div>
     @endif
 
@@ -221,58 +161,73 @@
 
                         <td>
                             <div class="action-group">
-                                <button type="button" class="edit" onclick='editData(@json($b))'>
-                                    Edit
-                                </button>
+                                <button class="edit" onclick='editData(@json($b))'>Edit</button>
 
-                                <form action="{{ route('petugas.buku.delete', $b->id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="hapus" onclick="return confirm('Hapus buku ini?')">
-                                        Delete
+                                @php
+                                    $dipinjam = \App\Models\Peminjaman::where('buku_id', $b->id)
+                                        ->where('status', 'dipinjam')
+                                        ->count();
+                                @endphp
+
+                                @if ($dipinjam > 0)
+                                    <button class="hapus" style="background:#9ca3af;cursor:not-allowed;" disabled>
+                                        Dipinjam
                                     </button>
-                                </form>
+                                @else
+                                    <form action="{{ route('petugas.buku.delete', $b->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="hapus" onclick="return confirm('Hapus buku ini?')">
+                                            Delete
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" style="text-align:center;">Tidak ada data buku</td>
+                        <td colspan="6" style="text-align:center;">Tidak ada data</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
 
-        {{-- INFO --}}
-        <div style="margin-top:10px; font-size:13px; color:#64748b;">
+        <div style="margin-top:10px;font-size:13px;color:#64748b;">
             Menampilkan {{ $bukus->firstItem() ?? 0 }} - {{ $bukus->lastItem() ?? 0 }}
             dari {{ $bukus->total() }} data
         </div>
     </div>
-    {{-- pagination --}}
+
     <div class="pagination-wrapper">
         {{ $bukus->links() }}
     </div>
+
     {{-- MODAL --}}
     <div id="modal" class="modal">
         <form method="POST" id="form" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="_method" id="method">
+
             <h3 id="title">Tambah Buku</h3>
+
             <input type="text" name="judul" id="judul" placeholder="Judul" required>
             <input type="text" name="penulis" id="penulis" placeholder="Penulis" required>
             <input type="text" name="penerbit" id="penerbit" placeholder="Penerbit">
-            <input type="number" name="tahun_terbit" id="tahun_terbit" placeholder="Tahun Terbit">
+            <input type="number" name="tahun_terbit" id="tahun_terbit" placeholder="Tahun">
+
             <select name="kategori_id" id="kategori_id" required>
                 <option value="">-- Pilih Kategori --</option>
                 @foreach ($kategoris as $k)
                     <option value="{{ $k->id }}">{{ $k->nama }}</option>
                 @endforeach
             </select>
+
             <textarea name="deskripsi" id="deskripsi" placeholder="Deskripsi"></textarea>
             <input type="number" name="stok" id="stok" placeholder="Stok" required>
             <input type="file" name="cover">
-            <div style="display:flex; gap:10px;">
+
+            <div style="display:flex;gap:10px;">
                 <button type="submit" class="btn">Simpan</button>
                 <button type="button" onclick="closeModal()">Batal</button>
             </div>
@@ -296,23 +251,24 @@
             document.getElementById('form').action = "/dashboard/petugas/buku/update/" + data.id;
             document.getElementById('method').value = 'PUT';
             document.getElementById('title').innerText = 'Edit Buku';
-            document.getElementById('judul').value = data.judul;
-            document.getElementById('penulis').value = data.penulis;
-            document.getElementById('penerbit').value = data.penerbit ?? '';
-            document.getElementById('tahun_terbit').value = data.tahun_terbit ?? '';
-            document.getElementById('kategori_id').value = data.kategori_id;
-            document.getElementById('deskripsi').value = data.deskripsi ?? '';
-            document.getElementById('stok').value = data.stok;
+
+            judul.value = data.judul;
+            penulis.value = data.penulis;
+            penerbit.value = data.penerbit ?? '';
+            tahun_terbit.value = data.tahun_terbit ?? '';
+            kategori_id.value = data.kategori_id;
+            deskripsi.value = data.deskripsi ?? '';
+            stok.value = data.stok;
         }
 
         function clearForm() {
-            document.getElementById('judul').value = '';
-            document.getElementById('penulis').value = '';
-            document.getElementById('penerbit').value = '';
-            document.getElementById('tahun_terbit').value = '';
-            document.getElementById('kategori_id').value = '';
-            document.getElementById('deskripsi').value = '';
-            document.getElementById('stok').value = '';
+            judul.value = '';
+            penulis.value = '';
+            penerbit.value = '';
+            tahun_terbit.value = '';
+            kategori_id.value = '';
+            deskripsi.value = '';
+            stok.value = '';
         }
 
         function closeModal() {

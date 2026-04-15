@@ -83,13 +83,6 @@
             margin: 5% auto;
             border-radius: 10px;
         }
-
-        /* PAGINATION */
-        .pagination-wrapper {
-            display: flex;
-            justify-content: center;
-            margin-top: 25px;
-        }
     </style>
 
     <h4 class="page-title">Kelola Denda</h4>

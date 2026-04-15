@@ -12,8 +12,8 @@ Route::get('/', function () {
 });
 // auth
 Route::middleware('guest')->group(function () {
-    Route::get('/login',    [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login',   [LoginController::class, 'login']);
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
 });
@@ -29,19 +29,14 @@ Route::middleware(['auth', 'role:user'])
         Route::get('/', [UserDashboardController::class, 'home'])->name('home');
         Route::get('/kategori', [UserDashboardController::class, 'kategori'])->name('kategori');
         Route::get('/library', [UserDashboardController::class, 'library'])->name('library');
-        Route::get('/library/{id}', [UserDashboardController::class, 'detailBuku'])
-            ->name('buku.detail');
+        Route::get('/library/{id}', [UserDashboardController::class, 'detailBuku'])->name('buku.detail');
         Route::get('/riwayat', [UserDashboardController::class, 'riwayat'])->name('riwayat');
         Route::get('/denda', [UserDashboardController::class, 'denda'])->name('denda');
         Route::get('/profile', [UserDashboardController::class, 'profile'])->name('profile');
-        Route::post('/profile/update', [UserDashboardController::class, 'updateProfile'])
-            ->name('profile.update');
-        Route::post('/pinjam/{id}', [UserDashboardController::class, 'pinjam'])
-            ->name('pinjam');
-        Route::post('/return/{id}', [UserDashboardController::class, 'returnBuku'])
-            ->name('return');
-        Route::post('/bayar/{id}', [UserDashboardController::class, 'bayar'])
-            ->name('bayar');
+        Route::post('/profile/update', [UserDashboardController::class, 'updateProfile'])->name('profile.update');
+        Route::post('/pinjam/{id}', [UserDashboardController::class, 'pinjam'])->name('pinjam');
+        Route::post('/return/{id}', [UserDashboardController::class, 'returnBuku'])->name('return');
+        Route::post('/bayar/{id}', [UserDashboardController::class, 'bayar'])->name('bayar');
     });
 // petugas
 Route::middleware(['auth', 'role:petugas'])
@@ -64,6 +59,9 @@ Route::middleware(['auth', 'role:petugas'])
         Route::post('/peminjaman/approve/{id}', [PetugasDashboardController::class, 'approve'])->name('peminjaman.approve');
         Route::post('/peminjaman/tolak/{id}', [PetugasDashboardController::class, 'tolakPeminjaman'])->name('peminjaman.tolak');
         Route::post('/peminjaman/return/{id}', [PetugasDashboardController::class, 'returnBuku'])->name('peminjaman.return');
+        Route::get('/pengembalian', [PetugasDashboardController::class, 'pengembalian'])->name('pengembalian');
+        Route::post('/pengembalian/{id}/approve', [PetugasDashboardController::class, 'approvePengembalian'])
+            ->name('pengembalian.approve');
         Route::get('/denda', [PetugasDashboardController::class, 'denda'])->name('denda');
         Route::post('/denda/konfirmasi/{id}', [PetugasDashboardController::class, 'konfirmasi'])->name('konfirmasi');
         Route::post('/denda/tolak/{id}', [PetugasDashboardController::class, 'tolak'])->name('tolak');
@@ -74,20 +72,12 @@ Route::middleware(['auth', 'role:kepala_perpustakaan'])
     ->name('kepala.')
     ->group(function () {
         Route::get('/', [KepalaDashboardController::class, 'home'])->name('home');
-        Route::get('/petugas', [KepalaDashboardController::class, 'petugas'])
-            ->name('petugas');
-        Route::post('/petugas/store', [KepalaDashboardController::class, 'storePetugas'])
-            ->name('petugas.store');
-        Route::put('/petugas/update/{id}', [KepalaDashboardController::class, 'updatePetugas'])
-            ->name('petugas.update');
-        Route::delete('/petugas/delete/{id}', [KepalaDashboardController::class, 'deletePetugas'])
-            ->name('petugas.delete');
-        Route::get('/laporan/peminjaman', [KepalaDashboardController::class, 'laporanPeminjaman'])
-            ->name('laporan.peminjaman');
-        Route::get('/laporan/denda', [KepalaDashboardController::class, 'laporanDenda'])
-            ->name('laporan.denda');
-        Route::get('/laporan/anggota', [KepalaDashboardController::class, 'laporanAnggota'])
-            ->name('laporan.anggota');
-        Route::get('/laporan/peminjaman/cetak', [KepalaDashboardController::class, 'cetaklaporanPeminjaman'])
-            ->name('laporan.peminjaman.cetak');
+        Route::get('/petugas', [KepalaDashboardController::class, 'petugas'])->name('petugas');
+        Route::post('/petugas/store', [KepalaDashboardController::class, 'storePetugas'])->name('petugas.store');
+        Route::put('/petugas/update/{id}', [KepalaDashboardController::class, 'updatePetugas'])->name('petugas.update');
+        Route::delete('/petugas/delete/{id}', [KepalaDashboardController::class, 'deletePetugas'])->name('petugas.delete');
+        Route::get('/laporan/peminjaman', [KepalaDashboardController::class, 'laporanPeminjaman'])->name('laporan.peminjaman');
+        Route::get('/laporan/denda', [KepalaDashboardController::class, 'laporanDenda'])->name('laporan.denda');
+        Route::get('/laporan/anggota', [KepalaDashboardController::class, 'laporanAnggota'])->name('laporan.anggota');
+        Route::get('/laporan/peminjaman/cetak', [KepalaDashboardController::class, 'cetaklaporanPeminjaman'])->name('laporan.peminjaman.cetak');
     });
