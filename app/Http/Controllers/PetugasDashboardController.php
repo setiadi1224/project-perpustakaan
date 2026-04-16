@@ -315,7 +315,7 @@ class PetugasDashboardController extends Controller
 
         // hitung hari (dibulatkan)
         $terlambat = $today->gt($batas)
-            ? (int) ceil($batas->diffInHours($today) / 24)
+            ? (int) floor($batas->diffInHours($today) / 24)
             : 0;
 
         // hitung denda (integer)
@@ -342,9 +342,9 @@ class PetugasDashboardController extends Controller
         $today = now();
         $batas = Carbon::parse($p->tanggal_kembali);
 
-        $terlambat = $today->gt($batas) ? $batas->diffInDays($today) : 0;
-
-        $denda = 0;
+        $terlambat = $today->gt($batas)
+            ? (int) floor($batas->diffInHours($today) / 24)
+            : 0;
 
         if ($terlambat > 0) {
             $dendaPerHari = 5000;
@@ -380,7 +380,7 @@ class PetugasDashboardController extends Controller
                 $batas = Carbon::parse($item->tanggal_kembali);
 
                 if (now()->gt($batas)) {
-                    $terlambat = $batas->diffInDays(now());
+                    $terlambat = (int) floor($batas->diffInHours(now()) / 24);
                     $denda = $terlambat * 5000 * $item->jumlah;
                 }
             }

@@ -124,6 +124,25 @@
             font-size: 12px;
             color: #94a3b8;
         }
+
+        @media (max-width: 768px) {
+            .book-list {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .book-item img {
+                height: 140px;
+            }
+
+            .book-item h4 {
+                font-size: 13px;
+            }
+
+            .book-item p {
+                font-size: 11px;
+            }
+        }
     </style>
 
     <div class="container">

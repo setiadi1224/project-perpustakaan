@@ -1,11 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\UserDashboardController;
-use App\Http\Controllers\PetugasDashboardController;
 use App\Http\Controllers\KepalaDashboardController;
+use App\Http\Controllers\PetugasDashboardController;
+use App\Http\Controllers\UserDashboardController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
@@ -37,6 +37,8 @@ Route::middleware(['auth', 'role:user'])
         Route::post('/pinjam/{id}', [UserDashboardController::class, 'pinjam'])->name('pinjam');
         Route::post('/return/{id}', [UserDashboardController::class, 'returnBuku'])->name('return');
         Route::post('/bayar/{id}', [UserDashboardController::class, 'bayar'])->name('bayar');
+        Route::get('/denda/struk/{id}', [UserDashboardController::class, 'struk'])->name('struk');
+        Route::get('/denda/pdf/{id}', [UserDashboardController::class, 'strukPdf'])->name('struk.pdf');
     });
 // petugas
 Route::middleware(['auth', 'role:petugas'])
@@ -80,4 +82,8 @@ Route::middleware(['auth', 'role:kepala_perpustakaan'])
         Route::get('/laporan/denda', [KepalaDashboardController::class, 'laporanDenda'])->name('laporan.denda');
         Route::get('/laporan/anggota', [KepalaDashboardController::class, 'laporanAnggota'])->name('laporan.anggota');
         Route::get('/laporan/peminjaman/cetak', [KepalaDashboardController::class, 'cetaklaporanPeminjaman'])->name('laporan.peminjaman.cetak');
+        Route::get('laporan/denda/cetak', [KepalaDashboardController::class, 'cetakLaporanDenda'])
+            ->name('laporan.cetak_denda');
+        Route::get('/security', [KepalaDashboardController::class, 'security'])
+            ->name('security');
     });
