@@ -347,7 +347,7 @@
     </div>
 
     {{-- PAGINATION --}}
-    <div style="margin-top:15px;">
+    <div class="pagination-wrapper">
         {{ $denda->links() }}
     </div>
 

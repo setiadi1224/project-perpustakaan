@@ -1,5 +1,7 @@
 @extends('kepala.layouts.app')
 
+@section('title', '')
+
 @section('content')
     <style>
         .container {
@@ -86,6 +88,10 @@
             background-color: green;
         }
 
+        .badge-Ditolak {
+            background-color: rgb(255, 0, 0);
+        }
+
         .badge-secondary {
             background-color: gray;
         }
@@ -117,7 +123,6 @@
             border-color: #007bff;
         }
     </style>
-
     <div class="container">
         <h2 class="judul">Laporan Peminjaman Buku</h2>
 
@@ -144,11 +149,27 @@
                     @endfor
                 </select>
             </div>
+            <div>
+                <label>Nama:</label>
+                <input type="text" name="nama" value="{{ request('nama') }}" placeholder="Cari nama">
+            </div>
+
+            <div>
+                <label>Buku:</label>
+                <input type="text" name="buku" value="{{ request('buku') }}" placeholder="Cari buku">
+            </div>
 
             <div>
                 <button type="submit">Filter</button>
-                <a href="{{ route('kepala.laporan.peminjaman.cetak', ['bulan' => $bulan, 'tahun' => $tahun]) }}"
-                    target="_blank">Cetak PDF</a>
+                <a href="{{ route('kepala.laporan.peminjaman.cetak', [
+                    'bulan' => $bulan,
+                    'tahun' => $tahun,
+                    'nama' => request('nama'),
+                    'buku' => request('buku'),
+                ]) }}"
+                    target="_blank">
+                    Cetak PDF
+                </a>
             </div>
         </form>
 
@@ -175,6 +196,8 @@
                                 <span class="badge badge-warning">Dipinjam</span>
                             @elseif($d->status == 'dikembalikan')
                                 <span class="badge badge-success">Selesai</span>
+                            @elseif($d->status == 'ditolak')
+                                <span class="badge badge-Ditolak">Ditolak</span>
                             @else
                                 <span class="badge badge-secondary">Menunggu</span>
                             @endif

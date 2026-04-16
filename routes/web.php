@@ -80,4 +80,6 @@ Route::middleware(['auth', 'role:kepala_perpustakaan'])
         Route::get('/laporan/denda', [KepalaDashboardController::class, 'laporanDenda'])->name('laporan.denda');
         Route::get('/laporan/anggota', [KepalaDashboardController::class, 'laporanAnggota'])->name('laporan.anggota');
         Route::get('/laporan/peminjaman/cetak', [KepalaDashboardController::class, 'cetaklaporanPeminjaman'])->name('laporan.peminjaman.cetak');
+        Route::get('laporan/denda/cetak', [KepalaDashboardController::class, 'cetakLaporanDenda'])
+            ->name('laporan.cetak_denda');
     });

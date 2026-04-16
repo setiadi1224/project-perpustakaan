@@ -10,7 +10,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-
 class KepalaDashboardController extends Controller
 {
     //dashboard
@@ -24,14 +23,7 @@ class KepalaDashboardController extends Controller
         $petugas = User::where('role', 'petugas')->latest()->take(5)->get();
         $bukuPopuler = Buku::latest()->take(5)->get();
 
-        return view('kepala.home', compact(
-            'totalBuku',
-            'totalAnggota',
-            'totalPeminjaman',
-            'totalDenda',
-            'petugas',
-            'bukuPopuler'
-        ));
+        return view('kepala.home', compact('totalBuku', 'totalAnggota', 'totalPeminjaman', 'totalDenda', 'petugas', 'bukuPopuler'));
     }
 
     //kelola petugas
@@ -39,8 +31,7 @@ class KepalaDashboardController extends Controller
     {
         $petugas = User::where('role', 'petugas')
             ->when($request->search, function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->search}%")
-                  ->orWhere('email', 'like', "%{$request->search}%");
+                $q->where('name', 'like', "%{$request->search}%")->orWhere('email', 'like', "%{$request->search}%");
             })
             ->latest()
             ->paginate(10);
@@ -111,39 +102,94 @@ class KepalaDashboardController extends Controller
     //laporan peminjaman
     public function laporanPeminjaman(Request $request)
     {
-        $bulan = $request->bulan ?? Carbon::now()->month;
-        $tahun = $request->tahun ?? Carbon::now()->year;
+        $bulan = $request->bulan ?? date('m');
+        $tahun = $request->tahun ?? date('Y');
+
+        $data = Peminjaman::with(['user', 'buku'])
+
+            // filter bulan & tahun
+            ->whereMonth('tanggal_pinjam', $bulan)
+            ->whereYear('tanggal_pinjam', $tahun)
+
+            // filter nama
+            ->when($request->nama, function ($q) use ($request) {
+                $q->whereHas('user', function ($qq) use ($request) {
+                    $qq->where('name', 'like', '%' . $request->nama . '%');
+                });
+            })
+
+            // filter buku
+            ->when($request->buku, function ($q) use ($request) {
+                $q->whereHas('buku', function ($qq) use ($request) {
+                    $qq->where('judul', 'like', '%' . $request->buku . '%');
+                });
+            })
+
+            ->latest()
+            ->paginate(5)
+            ->withQueryString();
+
+        return view('kepala.laporan.peminjaman', compact('data', 'bulan', 'tahun'));
+    }
+    //cetak laporan peminjaman
+    public function cetaklaporanPeminjaman(Request $request)
+    {
+        $bulan = $request->bulan ?? date('m');
+        $tahun = $request->tahun ?? date('Y');
+        $nama = $request->nama;
+        $buku = $request->buku;
 
         $query = Peminjaman::with(['user', 'buku'])
             ->whereMonth('tanggal_pinjam', $bulan)
             ->whereYear('tanggal_pinjam', $tahun);
 
-        $data = $query->paginate(10);
+        if ($nama) {
+            $query->whereHas('user', function ($q) use ($nama) {
+                $q->where('name', 'like', '%' . $nama . '%');
+            });
+        }
 
-        return view('kepala.laporan.peminjaman', compact('data', 'bulan', 'tahun'));
-    }
+        if ($buku) {
+            $query->whereHas('buku', function ($q) use ($buku) {
+                $q->where('judul', 'like', '%' . $buku . '%');
+            });
+        }
 
-    //cetak laporan peminjaman
-     public function cetaklaporanPeminjaman(Request $request)
-    {
-        $bulan = $request->bulan ?? date('m');
-        $tahun = $request->tahun ?? date('Y');
+        $data = $query->get();
 
-        $data = Peminjaman::with(['user', 'buku'])
-            ->whereMonth('tanggal_pinjam', $bulan)
-            ->whereYear('tanggal_pinjam', $tahun)
-            ->get();
+        $pdf = Pdf::loadView('kepala.laporan.cetak_peminjaman', compact('data', 'bulan', 'tahun', 'nama', 'buku'));
 
-        $pdf = pdf::loadView('kepala.laporan.cetak_peminjaman', compact('data', 'bulan', 'tahun'));
-        return $pdf->stream('laporan-peminjaman-'.$bulan.'-'.$tahun.'.pdf');
+        return $pdf->stream('laporan-peminjaman-' . $bulan . '-' . $tahun . '.pdf');
     }
     //laporan denda
-    public function laporanDenda()
+    public function laporanDenda(Request $request)
     {
-        $data = Peminjaman::with(['user','buku'])
-            ->where('denda','>',0)
+        $nama = $request->nama;
+        $buku = $request->buku;
+        $status = $request->status;
+
+        $data = Peminjaman::with(['user', 'buku'])
+            ->where('denda', '>', 0)
+
+            ->when($nama, function ($q) use ($nama) {
+                $q->whereHas('user', function ($qq) use ($nama) {
+                    $qq->where('name', 'like', '%' . $nama . '%');
+                });
+            })
+
+            ->when($buku, function ($q) use ($buku) {
+                $q->whereHas('buku', function ($qq) use ($buku) {
+                    $qq->where('judul', 'like', '%' . $buku . '%');
+                });
+            })
+
+            ->when($status, function ($q) use ($status) {
+                $q->where('status_pembayaran', $status);
+            })
+
             ->latest()
-            ->paginate(10);
+            ->paginate(5)
+            ->withQueryString();
 
         return view('kepala.laporan.denda', compact('data'));
     }
@@ -151,7 +197,39 @@ class KepalaDashboardController extends Controller
     //laporan anggota
     public function laporanAnggota()
     {
-        $data = User::where('role','user')->latest()->paginate(10);
+        $data = User::where('role', 'user')->latest()->paginate(10);
         return view('kepala.laporan.anggota', compact('data'));
+    }
+
+    public function cetakLaporanDenda(Request $request)
+    {
+        $nama = $request->nama;
+        $buku = $request->buku;
+        $status = $request->status;
+
+        $query = Peminjaman::with(['user', 'buku'])
+            ->where('denda', '>', 0);
+
+        if ($nama) {
+            $query->whereHas('user', function ($q) use ($nama) {
+                $q->where('name', 'like', '%' . $nama . '%');
+            });
+        }
+
+        if ($buku) {
+            $query->whereHas('buku', function ($q) use ($buku) {
+                $q->where('judul', 'like', '%' . $buku . '%');
+            });
+        }
+
+        if ($status) {
+            $query->where('status_pembayaran', $status);
+        }
+
+        $data = $query->get();
+
+        $pdf = Pdf::loadView('kepala.laporan.cetak_denda', compact('data', 'nama', 'buku', 'status'));
+
+        return $pdf->stream('laporan-denda.pdf');
     }
 }

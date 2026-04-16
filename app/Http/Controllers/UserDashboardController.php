@@ -157,7 +157,21 @@ class UserDashboardController extends Controller
     {
         $buku = Buku::with('kategori')->findOrFail($id);
 
-        $rekomendasi = Buku::where('id', '!=', $id)->latest()->take(4)->get();
+        $rekomendasi = Buku::where('kategori_id', $buku->kategori_id)
+            ->where('id', '!=', $id)
+            ->latest()
+            ->take(6)
+            ->get();
+
+        if ($rekomendasi->count() < 6) {
+            $tambahan = Buku::where('id', '!=', $id)
+                ->whereNotIn('id', $rekomendasi->pluck('id'))
+                ->inRandomOrder()
+                ->take(6 - $rekomendasi->count())
+                ->get();
+
+            $rekomendasi = $rekomendasi->merge($tambahan);
+        }
 
         $pinjaman = Peminjaman::where('user_id', Auth::id())
             ->where('buku_id', $id)
@@ -166,7 +180,6 @@ class UserDashboardController extends Controller
 
         return view('user.detail_buku', compact('buku', 'rekomendasi', 'pinjaman'));
     }
-
     // riwayat
     public function riwayat(Request $request)
     {

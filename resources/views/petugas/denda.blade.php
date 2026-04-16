@@ -89,9 +89,8 @@
 
     <div class="denda-card">
         <h3>Total Denda Aktif</h3>
-        <h1>Rp {{ number_format($totalDenda, 0, ',', '.') }}</h1>
+        <h1>Rp {{ number_format($totalDenda) }}</h1>
     </div>
-
     <div class="table-box">
         <table width="100%">
             <thead>
@@ -113,7 +112,7 @@
                         <td>{{ $item->user->name }}</td>
                         <td>{{ $item->buku->judul }}</td>
                         <td>{{ (int) $item->terlambat }} Hari</td>
-                        <td>Rp {{ number_format($item->total_denda, 0, ',', '.') }}</td>
+                        <td>Rp {{ number_format($item->denda, 0, ',', '.') }}</td>
 
                         {{-- METODE --}}
                         <td>
