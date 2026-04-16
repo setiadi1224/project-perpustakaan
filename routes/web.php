@@ -5,7 +5,6 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\KepalaDashboardController;
 use App\Http\Controllers\PetugasDashboardController;
 use App\Http\Controllers\UserDashboardController;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -38,6 +37,8 @@ Route::middleware(['auth', 'role:user'])
         Route::post('/pinjam/{id}', [UserDashboardController::class, 'pinjam'])->name('pinjam');
         Route::post('/return/{id}', [UserDashboardController::class, 'returnBuku'])->name('return');
         Route::post('/bayar/{id}', [UserDashboardController::class, 'bayar'])->name('bayar');
+        Route::get('/denda/struk/{id}', [UserDashboardController::class, 'struk'])->name('struk');
+        Route::get('/denda/pdf/{id}', [UserDashboardController::class, 'strukPdf'])->name('struk.pdf');
     });
 // petugas
 Route::middleware(['auth', 'role:petugas'])

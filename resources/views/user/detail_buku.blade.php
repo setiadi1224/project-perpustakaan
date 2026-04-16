@@ -162,6 +162,26 @@
             transform: translateY(-3px);
         }
 
+        .alert {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .alert.success {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .alert.error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
         /* DESKRIPSI */
         .deskripsi {
             margin-top: 18px;
@@ -238,6 +258,18 @@
         }
     </style>
     <div class="detail-wrapper">
+        {{-- ALERT --}}
+        @if (session('success'))
+            <div class="alert success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert error">
+                {{ session('error') }}
+            </div>
+        @endif
         <div class="detail-card">
             {{-- COVER --}}
             <div class="cover">

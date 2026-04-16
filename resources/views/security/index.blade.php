@@ -77,54 +77,7 @@ tr:hover {
 .badge-medium { background: orange; color: black; }
 .badge-low { background: green; }
 
-/* PAGINATION */
-        .pagination-wrapper {
-            display: flex;
-            justify-content: center;
-            margin-top: 25px;
-        }
 
-        .pagination {
-            display: flex;
-            gap: 8px;
-        }
-
-        .pagination li {
-            list-style: none;
-        }
-
-        .pagination a,
-        .pagination span {
-            min-width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            border: 1px solid #334155;
-            background: #1e293b;
-            color: #cbd5e1;
-            text-decoration: none;
-            font-size: 13px;
-            transition: 0.2s;
-        }
-
-        .pagination a:hover {
-            background: #3b82f6;
-            color: white;
-            transform: translateY(-2px);
-            border-color: #3b82f6;
-        }
-
-        .pagination .active span {
-            background: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
-        }
-
-        .pagination .disabled span {
-            opacity: 0.4;
-        }
 </style>
 
 <div class="security-wrap">

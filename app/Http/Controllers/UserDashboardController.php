@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Buku;
 use App\Models\Kategori;
 use App\Models\Peminjaman;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -111,6 +112,15 @@ class UserDashboardController extends Controller
     }
     public function pinjam(Request $request, $id)
     {
+
+        $punyaDenda = Peminjaman::where('user_id', Auth::id())
+            ->whereIn('status_pembayaran', ['belum', 'menunggu'])
+            ->where('denda', '>', 0)
+            ->exists();
+
+        if ($punyaDenda) {
+            return back()->with('error', 'Anda masih memiliki denda, harap lunasi terlebih dahulu');
+        }
         $request->validate([
             'jumlah' => 'required|integer|min:1|max:5',
         ]);
@@ -137,7 +147,7 @@ class UserDashboardController extends Controller
             ->sum('jumlah');
 
         if ($totalDipinjam + $jumlah > 5) {
-            return back()->with('error', 'Maksimal 5 buku');
+            return back()->with('error', 'Maksimal 5 buku Yang Di pinjam');
         }
 
         $buku->decrement('stok', $jumlah);
@@ -223,17 +233,18 @@ class UserDashboardController extends Controller
                     $dendaFix = $terlambat * 5000 * $item->jumlah;
                 }
             }
+            if ($item->status == 'dikembalikan') {
+                $batas = Carbon::parse($item->tanggal_kembali);
 
-            if ($item->status_pembayaran == 'lunas') {
-                $dendaFix = 0;
+                if ($item->updated_at > $batas) {
+                   $terlambat = floor($batas->diffInDays(now()));
+                } else {
+                    $terlambat = 0;
+                }
             }
-
             $item->terlambat = $terlambat;
             $item->total_denda = $dendaFix;
-
-            $totalDenda += $dendaFix;
         }
-
         return view('user.denda', compact('denda', 'totalDenda'));
     }
 
@@ -279,7 +290,33 @@ class UserDashboardController extends Controller
             return back()->with('success', 'Silakan bayar ke petugas');
         }
     }
+    public function struk($id)
+    {
+        $p = Peminjaman::with('buku', 'user')->findOrFail($id);
 
+        if ($p->user_id != Auth::id()) {
+            abort(403);
+        }
+
+        $noTransaksi = 'TRX-' . $p->id . '-' . date('Ymd');
+
+        return view('user.struk', compact('p', 'noTransaksi'));
+    }
+
+    public function strukPdf($id)
+    {
+        $p = Peminjaman::with('buku', 'user')->findOrFail($id);
+
+        if ($p->user_id != Auth::id()) {
+            abort(403);
+        }
+
+        $noTransaksi = 'TRX-' . $p->id . '-' . date('Ymd');
+
+        $pdf = Pdf::loadView('user.struk', compact('p', 'noTransaksi'));
+
+        return $pdf->download('struk.pdf');
+    }
     // profile
     public function profile()
     {

@@ -206,6 +206,46 @@
             font-size: 12px;
             color: #94a3b8;
         }
+
+        .action-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-modern {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.25s;
+            border: 1px solid transparent;
+        }
+
+        /* STRUK */
+        .btn-struk {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+
+        .btn-struk:hover {
+            transform: translateY(-2px);
+        }
+
+        /* PDF */
+        .btn-pdf {
+            background: rgba(59, 130, 246, .1);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, .3);
+        }
+
+        .btn-pdf:hover {
+            background: #3b82f6;
+            color: white;
+        }
     </style>
 
     <div class="main-content">
@@ -240,7 +280,17 @@
                             <td>{{ $item->buku->judul }}</td>
 
                             <td>
-                                {{ $item->status == 'dikembalikan' ? 0 : $item->terlambat }} Hari
+                                {{ $item->terlambat ?? 0 }} Hari
+
+                                @if ($item->terlambat > 0)
+                                    <div style="font-size:11px; color:#f87171;">
+                                        Terlambat
+                                    </div>
+                                @else
+                                    <div style="font-size:11px; color:#4ade80;">
+                                        Tepat Waktu
+                                    </div>
+                                @endif
                             </td>
 
                             <td>
@@ -265,8 +315,19 @@
                                         onclick="openModal({{ $item->id }}, {{ $item->total_denda }})">
                                         Bayar
                                     </button>
-                                @else
-                                    -
+                                @endif
+
+                                @if ($item->status_pembayaran == 'lunas')
+                                    <div class="action-group">
+                                        <a href="{{ route('user.struk', $item->id) }}" target="_blank"
+                                            class="btn-modern btn-struk">
+                                            🧾 Struk
+                                        </a>
+
+                                        <a href="{{ route('user.struk.pdf', $item->id) }}" class="btn-modern btn-pdf">
+                                            📄 PDF
+                                        </a>
+                                    </div>
                                 @endif
                             </td>
                         </tr>
@@ -278,14 +339,27 @@
             <div class="card-list">
                 @foreach ($denda as $item)
                     <div class="card">
+
                         <h4>{{ $item->buku->judul }}</h4>
 
                         <div class="card-item">
-                            ⏱ Terlambat: {{ $item->status == 'dikembalikan' ? 0 : $item->terlambat }} Hari
+                            ⏱ Terlambat:
+                            <strong>{{ $item->terlambat ?? 0 }} Hari</strong>
+
+                            @if ($item->terlambat > 0)
+                                <div style="font-size:11px; color:#f87171;">
+                                    Terlambat
+                                </div>
+                            @else
+                                <div style="font-size:11px; color:#4ade80;">
+                                    Tepat Waktu
+                                </div>
+                            @endif
                         </div>
 
                         <div class="card-item">
-                            💰 Denda: Rp {{ number_format($item->total_denda, 0, ',', '.') }}
+                            💰 Denda:
+                            <strong>Rp {{ number_format($item->total_denda, 0, ',', '.') }}</strong>
                         </div>
 
                         <div class="card-item">
@@ -301,15 +375,34 @@
                             </span>
                         </div>
 
-                        @if ($item->status_pembayaran == 'belum' && $item->total_denda > 0)
-                            <button class="btn-bayar" onclick="openModal({{ $item->id }}, {{ $item->total_denda }})">
-                                Bayar
-                            </button>
-                        @endif
+                        {{-- ACTION --}}
+                        <div style="margin-top:10px;">
+
+                            @if ($item->status_pembayaran == 'belum' && $item->total_denda > 0)
+                                <button class="btn-bayar"
+                                    onclick="openModal({{ $item->id }}, {{ $item->total_denda }})">
+                                    Bayar Sekarang
+                                </button>
+                            @endif
+
+                            @if ($item->status_pembayaran == 'lunas')
+                                <div class="action-group" style="margin-top:8px;">
+                                    <a href="{{ route('user.struk', $item->id) }}" target="_blank"
+                                        class="btn-modern btn-struk">
+                                        🧾 Struk
+                                    </a>
+
+                                    <a href="{{ route('user.struk.pdf', $item->id) }}" class="btn-modern btn-pdf">
+                                        📄 PDF
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 @endforeach
             </div>
         </div>
+    </div>
     </div>
 
     {{-- MODAL --}}
