@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Daftarkan alias middleware RoleMiddleware
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'security' => \App\Http\Middleware\SecurityAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

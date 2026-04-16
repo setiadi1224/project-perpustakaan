@@ -8,6 +8,7 @@ use App\Models\User;
 use Barryvdh\DomPDF\Facade\pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class KepalaDashboardController extends Controller
@@ -231,5 +232,13 @@ class KepalaDashboardController extends Controller
         $pdf = Pdf::loadView('kepala.laporan.cetak_denda', compact('data', 'nama', 'buku', 'status'));
 
         return $pdf->stream('laporan-denda.pdf');
+    }
+    public function security()
+    {
+        $logs = DB::table('security_logs')
+            ->latest()
+            ->paginate(5);
+
+        return view('security.index', compact('logs'));
     }
 }

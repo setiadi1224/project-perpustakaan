@@ -307,7 +307,11 @@
             document.querySelector('.overlay').classList.remove('active');
         }
     </script>
-
+    @if (session('warning'))
+        <div style="background: orange; padding:10px;">
+            ⚠️ {{ session('warning') }}
+        </div>
+    @endif
 </body>
 
 </html>

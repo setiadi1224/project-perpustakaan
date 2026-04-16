@@ -244,6 +244,11 @@
                 <li class="{{ request()->routeIs('kepala.laporan.denda') ? 'active' : '' }}">
                     <a href="{{ route('kepala.laporan.denda') }}"> Laporan Denda</a>
                 </li>
+                <li class="{{ request()->routeIs('kepala.security') ? 'active' : '' }}">
+                    <a href="{{ route('kepala.security') }}">
+                         Security Monitoring
+                    </a>
+                </li>
             </ul>
             <div class="sb-bottom">
                 <form method="POST" action="{{ route('logout') }}">
